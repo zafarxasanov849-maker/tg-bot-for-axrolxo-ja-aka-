@@ -1,0 +1,13 @@
+from .common import router as common_router
+from .vsl import router as vsl_router
+from .lead_magnet import router as lead_magnet_router
+from .seminar import router as seminar_router
+from .sales import router as sales_router
+
+__all__ = [
+    "common_router",
+    "vsl_router",
+    "lead_magnet_router",
+    "seminar_router",
+    "sales_router",
+]
