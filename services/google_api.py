@@ -45,7 +45,7 @@ RAW_HEADERS = [
     "registrations", "show_up", "deposits", "sales_count", "full_payments",
     # Sales / LTV
     "customer_id", "funnel_source", "tariff_type", "price",
-    "customer_type",
+    "customer_type", "lead_status",
     # Meta
     "screenshot_url", "anomaly_flag", "anomaly_explanation",
 ]

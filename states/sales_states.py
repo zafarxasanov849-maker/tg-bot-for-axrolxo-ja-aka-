@@ -7,5 +7,6 @@ class SalesStates(StatesGroup):
     tariff_type = State()
     price = State()
     customer_type = State()   # new / upsell / recurring
+    lead_status = State()     # hot / warm / cold (kvalifikatsiya natijasi)
     screenshot = State()
     anomaly_explanation = State()
