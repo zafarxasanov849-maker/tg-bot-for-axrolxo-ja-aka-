@@ -44,12 +44,14 @@ async def main() -> None:
     dp.include_router(seminar_router)
     dp.include_router(sales_router)
 
-    # Ensure Google Sheets tabs exist
+    # Ensure Google Sheets tabs exist (skip if service_account.json not configured)
     sheets = GoogleSheetsService()
-    await sheets.ensure_tabs()
-
-    # Start reminder scheduler
-    start_scheduler(bot, sheets)
+    try:
+        await sheets.ensure_tabs()
+        start_scheduler(bot, sheets)
+    except Exception as e:
+        logger.warning("Google Sheets not configured yet: %s", e)
+        logger.warning("Bot will run without Sheets integration.")
 
     logger.info("Bot starting…")
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
