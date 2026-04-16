@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>KPI Kiritish</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d2e;
+      --border: #2d3148;
+      --accent: #F5A623;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --green: #34d399;
+      --red: #f87171;
+    }
+    body {
+      font-family: -apple-system, 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+    h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 18px; }
+    .step { display: none; }
+    .step.active { display: block; }
+
+    /* Funnel selector */
+    .funnel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .funnel-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.1s;
+    }
+    .funnel-btn:active { transform: scale(0.97); }
+    .funnel-btn.selected { border-color: var(--accent); background: rgba(245,166,35,0.08); }
+    .funnel-btn .icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .funnel-btn .label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+
+    /* Form fields */
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    input, select {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 14px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    select option { background: #1a1d2e; }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+    .btn:active { opacity: 0.8; }
+    .btn-primary { background: var(--accent); color: #0f1117; }
+    .btn-back { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
+
+    /* Success */
+    .success-box {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .success-icon { font-size: 4rem; margin-bottom: 16px; }
+    .success-title { font-size: 1.3rem; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+    .success-sub { color: var(--muted); font-size: 0.9rem; }
+
+    /* Error */
+    .error-msg {
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      color: var(--red);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- STEP 1: Funnel tanlash -->
+<div class="step active" id="step1">
+  <h2>📊 KPI Kiritish</h2>
+  <div class="section-title">Voronkani tanlang</div>
+  <div class="funnel-grid">
+    <div class="funnel-btn" onclick="selectFunnel('vsl', this)">
+      <div class="icon">📹</div>
+      <div class="label">VSL</div>
+    </div>
+    <div class="funnel-btn" onclick="selectFunnel('lead_magnet', this)">
+      <div class="icon">🧲</div>
+      <div class="label">Lead Magnet</div>
+    </div>
+    <div class="funnel-btn" onclick="selectFunnel('seminar', this)">
+      <div class="icon">🎓</div>
+      <div class="label">Seminar</div>
+    </div>
+    <div class="funnel-btn" onclick="selectFunnel('sales', this)">
+      <div class="icon">💰</div>
+      <div class="label">Sotuv / LTV</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2: VSL Form -->
+<div class="step" id="step-vsl">
+  <h2>📹 VSL Voronkasi</h2>
+  <div class="error-msg" id="err-vsl"></div>
+  <div class="field"><label>Ad Spend (so'm)</label><input type="number" id="vsl_ad_spend" placeholder="0"/></div>
+  <div class="field"><label>Sahifa ko'rishlar</label><input type="number" id="vsl_page_views" placeholder="0"/></div>
+  <div class="field"><label>Video boshlash</label><input type="number" id="vsl_video_start" placeholder="0"/></div>
+  <div class="field"><label>50% tomosha</label><input type="number" id="vsl_watch_50" placeholder="0"/></div>
+  <div class="field"><label>100% tomosha</label><input type="number" id="vsl_watch_100" placeholder="0"/></div>
+  <div class="field"><label>CTA bosilish</label><input type="number" id="vsl_cta_clicks" placeholder="0"/></div>
+  <button class="btn btn-primary" onclick="submitForm('vsl')">✅ Yuborish</button>
+  <button class="btn btn-back" onclick="goBack()">← Orqaga</button>
+</div>
+
+<!-- STEP 2: Lead Magnet Form -->
+<div class="step" id="step-lead_magnet">
+  <h2>🧲 Lead Magnet</h2>
+  <div class="error-msg" id="err-lead_magnet"></div>
+  <div class="field"><label>Ad Spend (so'm)</label><input type="number" id="lm_ad_spend" placeholder="0"/></div>
+  <div class="field"><label>Landing sahifa ko'rishlar</label><input type="number" id="lm_lp_views" placeholder="0"/></div>
+  <div class="field"><label>Yangi leadlar</label><input type="number" id="lm_new_leads" placeholder="0"/></div>
+  <div class="field"><label>Bog'lanilganlar</label><input type="number" id="lm_contacted" placeholder="0"/></div>
+  <button class="btn btn-primary" onclick="submitForm('lead_magnet')">✅ Yuborish</button>
+  <button class="btn btn-back" onclick="goBack()">← Orqaga</button>
+</div>
+
+<!-- STEP 2: Seminar Form -->
+<div class="step" id="step-seminar">
+  <h2>🎓 Seminar</h2>
+  <div class="error-msg" id="err-seminar"></div>
+  <div class="field"><label>Ad Spend (so'm)</label><input type="number" id="sem_ad_spend" placeholder="0"/></div>
+  <div class="field"><label>Ro'yxatdan o'tganlar</label><input type="number" id="sem_registrations" placeholder="0"/></div>
+  <div class="field"><label>Kelganlar (Show-up)</label><input type="number" id="sem_show_up" placeholder="0"/></div>
+  <div class="field"><label>Depozitlar</label><input type="number" id="sem_deposits" placeholder="0"/></div>
+  <div class="field"><label>Sotuvlar</label><input type="number" id="sem_sales_count" placeholder="0"/></div>
+  <div class="field"><label>To'liq to'lovlar</label><input type="number" id="sem_full_payments" placeholder="0"/></div>
+  <button class="btn btn-primary" onclick="submitForm('seminar')">✅ Yuborish</button>
+  <button class="btn btn-back" onclick="goBack()">← Orqaga</button>
+</div>
+
+<!-- STEP 2: Sales Form -->
+<div class="step" id="step-sales">
+  <h2>💰 Sotuv / LTV</h2>
+  <div class="error-msg" id="err-sales"></div>
+  <div class="field"><label>Mijoz ID</label><input type="text" id="sales_customer_id" placeholder="Telefon yoki username"/></div>
+  <div class="field">
+    <label>Manba (Funnel)</label>
+    <select id="sales_funnel_source">
+      <option value="VSL">VSL</option>
+      <option value="Lead_Magnet">Lead Magnet</option>
+      <option value="Seminar">Seminar</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Tarif</label>
+    <select id="sales_tariff_type">
+      <option value="Standart">Standart — 24M</option>
+      <option value="Premium">Premium — 30M</option>
+    </select>
+  </div>
+  <div class="field"><label>Narx (so'm)</label><input type="number" id="sales_price" placeholder="24000000"/></div>
+  <div class="field">
+    <label>Mijoz turi</label>
+    <select id="sales_customer_type">
+      <option value="Yangi">Yangi</option>
+      <option value="Qaytgan">Qaytgan</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Lead holati</label>
+    <select id="sales_lead_status">
+      <option value="Issiq">🔥 Issiq</option>
+      <option value="Iliq">🌡 Iliq</option>
+      <option value="Sovuq">❄️ Sovuq</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" onclick="submitForm('sales')">✅ Yuborish</button>
+  <button class="btn btn-back" onclick="goBack()">← Orqaga</button>
+</div>
+
+<!-- SUCCESS -->
+<div class="step" id="step-success">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Yuborildi!</div>
+    <div class="success-sub">Ma'lumotlar Google Sheets ga saqlandi.</div>
+    <button class="btn btn-primary" style="margin-top:32px" onclick="resetForm()">+ Yana kiritish</button>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+tg.ready();
+
+let currentFunnel = null;
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function selectFunnel(funnel, el) {
+  document.querySelectorAll('.funnel-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  currentFunnel = funnel;
+  setTimeout(() => showStep('step-' + funnel), 150);
+}
+
+function goBack() {
+  showStep('step1');
+  currentFunnel = null;
+}
+
+function resetForm() {
+  goBack();
+  document.querySelectorAll('input').forEach(i => i.value = '');
+}
+
+function showError(funnel, msg) {
+  const el = document.getElementById('err-' + funnel);
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+function hideError(funnel) {
+  const el = document.getElementById('err-' + funnel);
+  if (el) el.style.display = 'none';
+}
+
+function g(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+async function submitForm(funnel) {
+  hideError(funnel);
+  let data = {
+    funnel_type: funnel,
+    reporter_id: tg.initDataUnsafe?.user?.id || 0,
+    reporter_username: tg.initDataUnsafe?.user?.username || '',
+  };
+
+  if (funnel === 'vsl') {
+    data = { ...data,
+      ad_spend: g('vsl_ad_spend'), page_views: g('vsl_page_views'),
+      video_start: g('vsl_video_start'), watch_50: g('vsl_watch_50'),
+      watch_100: g('vsl_watch_100'), cta_clicks: g('vsl_cta_clicks'),
+    };
+  } else if (funnel === 'lead_magnet') {
+    data = { ...data,
+      ad_spend: g('lm_ad_spend'), lp_views: g('lm_lp_views'),
+      new_leads: g('lm_new_leads'), contacted: g('lm_contacted'),
+    };
+  } else if (funnel === 'seminar') {
+    data = { ...data,
+      ad_spend: g('sem_ad_spend'), registrations: g('sem_registrations'),
+      show_up: g('sem_show_up'), deposits: g('sem_deposits'),
+      sales_count: g('sem_sales_count'), full_payments: g('sem_full_payments'),
+    };
+  } else if (funnel === 'sales') {
+    data = { ...data,
+      customer_id: g('sales_customer_id'), funnel_source: g('sales_funnel_source'),
+      tariff_type: g('sales_tariff_type'), price: g('sales_price'),
+      customer_type: g('sales_customer_type'), lead_status: g('sales_lead_status'),
+    };
+  }
+
+  try {
+    const btn = document.querySelector(`#step-${funnel} .btn-primary`);
+    btn.textContent = 'Yuborilmoqda...';
+    btn.disabled = true;
+
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+
+    if (json.ok) {
+      showStep('step-success');
+      tg.HapticFeedback?.notificationOccurred('success');
+    } else {
+      showError(funnel, json.error || 'Xato yuz berdi');
+    }
+  } catch (e) {
+    showError(funnel, 'Tarmoq xatosi. Qayta urinib ko\'ring.');
+  } finally {
+    const btn = document.querySelector(`#step-${funnel} .btn-primary`);
+    if (btn) { btn.textContent = '✅ Yuborish'; btn.disabled = false; }
+  }
+}
+</script>
+</body>
+</html>

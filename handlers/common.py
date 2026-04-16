@@ -10,12 +10,19 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     Message,
     CallbackQuery,
+    WebAppInfo,
 )
 
 router = Router()
 
+MINIAPP_URL = "https://rahbarlarkursi.duckdns.org/miniapp"
+
 FUNNEL_KEYBOARD = InlineKeyboardMarkup(
     inline_keyboard=[
+        [InlineKeyboardButton(
+            text="📊 Raqamlarni kiritish (Mini App)",
+            web_app=WebAppInfo(url=MINIAPP_URL),
+        )],
         [InlineKeyboardButton(text="📹 VSL Voronkasi", callback_data="funnel:vsl")],
         [InlineKeyboardButton(text="🧲 Lead Magnet", callback_data="funnel:lead_magnet")],
         [InlineKeyboardButton(text="🎓 Seminar", callback_data="funnel:seminar")],

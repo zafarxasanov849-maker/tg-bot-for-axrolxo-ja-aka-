@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask import Flask, jsonify, render_template, request, session, redirect, url_for
 from services.google_api import GoogleSheetsService
 from config import SHEET_RAW_DATA, SHEET_DAILY_SUMMARY, SHEET_LTV_COHORT
+from datetime import date, datetime
 import logging
 
 app = Flask(__name__)
@@ -77,6 +78,61 @@ def api_ltv():
         ws = ss.worksheet(SHEET_LTV_COHORT)
         records = ws.get_all_records()
         return jsonify({"ok": True, "data": records})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/miniapp")
+def miniapp():
+    return render_template("miniapp.html")
+
+
+@app.route("/api/submit", methods=["POST"])
+def api_submit():
+    try:
+        data = request.get_json(force=True)
+        funnel = data.get("funnel_type", "")
+        now = datetime.now()
+        row = {
+            "timestamp": now.isoformat(),
+            "date": date.today().isoformat(),
+            "reporter_id": data.get("reporter_id", ""),
+            "reporter_role": "MINIAPP",
+            "funnel_type": funnel,
+            "ad_spend": data.get("ad_spend", ""),
+            "page_views": data.get("page_views", ""),
+            "video_start": data.get("video_start", ""),
+            "watch_50": data.get("watch_50", ""),
+            "watch_100": data.get("watch_100", ""),
+            "cta_clicks": data.get("cta_clicks", ""),
+            "lp_views": data.get("lp_views", ""),
+            "new_leads": data.get("new_leads", ""),
+            "contacted": data.get("contacted", ""),
+            "registrations": data.get("registrations", ""),
+            "show_up": data.get("show_up", ""),
+            "deposits": data.get("deposits", ""),
+            "sales_count": data.get("sales_count", ""),
+            "full_payments": data.get("full_payments", ""),
+            "customer_id": data.get("customer_id", ""),
+            "funnel_source": data.get("funnel_source", ""),
+            "tariff_type": data.get("tariff_type", ""),
+            "price": data.get("price", ""),
+            "customer_type": data.get("customer_type", ""),
+            "lead_status": data.get("lead_status", ""),
+            "screenshot_url": "",
+            "anomaly_flag": "",
+            "anomaly_explanation": "",
+        }
+        ss = sheets._connect()
+        from services.google_api import RAW_HEADERS
+        ws = ss.worksheet(SHEET_RAW_DATA)
+        values = [str(row.get(h, "")) for h in RAW_HEADERS]
+        ws.append_row(values, value_input_option="USER_ENTERED")
+
+        if funnel == "sales" and data.get("customer_id"):
+            sheets._upsert_ltv_sync(row)
+
+        return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 
