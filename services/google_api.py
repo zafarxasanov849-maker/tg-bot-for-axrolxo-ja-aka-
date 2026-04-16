@@ -62,8 +62,9 @@ class GoogleSheetsService:
 
     def _connect(self) -> gspread.Spreadsheet:
         if self._spreadsheet is None:
-            creds = _get_credentials()
-            self._client = gspread.authorize(creds)
+            self._client = gspread.service_account(
+                filename=SERVICE_ACCOUNT_FILE, scopes=SCOPES
+            )
             self._spreadsheet = self._client.open_by_key(SPREADSHEET_ID)
         return self._spreadsheet
 
