@@ -18,6 +18,7 @@ from handlers import (
     lead_magnet_router,
     seminar_router,
     sales_router,
+    stats_router,
 )
 from services.google_api import GoogleSheetsService
 from services.scheduler import start_scheduler
@@ -39,6 +40,7 @@ async def main() -> None:
 
     # Routers — order matters: common first, then funnel-specific
     dp.include_router(common_router)
+    dp.include_router(stats_router)
     dp.include_router(vsl_router)
     dp.include_router(lead_magnet_router)
     dp.include_router(seminar_router)

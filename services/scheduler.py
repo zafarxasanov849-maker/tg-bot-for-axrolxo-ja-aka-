@@ -7,7 +7,7 @@ APScheduler-based reminder system.
 from __future__ import annotations
 
 import logging
-from datetime import date
+from datetime import date, timedelta
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -60,6 +60,24 @@ def _build_scheduler(bot: Bot, sheets) -> AsyncIOScheduler:
         CronTrigger(hour=FINAL_NUDGE_HOUR, minute=FINAL_NUDGE_MINUTE, timezone=TIMEZONE),
         args=[bot, sheets],
         id="final_nudge",
+        replace_existing=True,
+    )
+
+    # 09:00 — kunlik hisobot Founder ga
+    scheduler.add_job(
+        _daily_report,
+        CronTrigger(hour=9, minute=0, timezone=TIMEZONE),
+        args=[bot, sheets],
+        id="daily_report",
+        replace_existing=True,
+    )
+
+    # Dushanba 09:00 — haftalik hisobot
+    scheduler.add_job(
+        _weekly_report,
+        CronTrigger(day_of_week="mon", hour=9, minute=0, timezone=TIMEZONE),
+        args=[bot, sheets],
+        id="weekly_report",
         replace_existing=True,
     )
 
@@ -155,6 +173,83 @@ async def _escalate_missing(bot: Bot, sheets) -> None:
         )
     except Exception as exc:
         logger.warning("Could not escalate to founder: %s", exc)
+
+
+def _fmt(n) -> str:
+    try:
+        v = float(n)
+        if v >= 1_000_000:
+            return f"{v/1_000_000:.1f}M"
+        if v >= 1_000:
+            return f"{v/1_000:.0f}K"
+        return f"{v:,.0f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+async def _daily_report(bot: Bot, sheets) -> None:
+    """09:00 — kecha (yesterday) kunlik hisobot Founder ga."""
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+    try:
+        ss = sheets._connect()
+        ws = ss.worksheet("Daily_Summary")
+        records = ws.get_all_records()
+        row = next((r for r in records if r.get("date") == yesterday), None)
+        if not row:
+            return
+        await bot.send_message(
+            FOUNDER_ID,
+            f"☀️ *Kunlik hisobot* — {yesterday}\n\n"
+            f"💸 Ad Spend: `{_fmt(row.get('total_ad_spend'))}` so'm\n"
+            f"👥 Leads: `{_fmt(row.get('total_leads'))}`\n"
+            f"💰 Sotuvlar: `{_fmt(row.get('total_sales'))}`\n"
+            f"💵 Daromad: `{_fmt(row.get('total_revenue'))}` so'm\n"
+            f"📈 CAC: `{_fmt(row.get('blended_cac'))}` so'm\n"
+            f"🏆 Avg LTV: `{_fmt(row.get('avg_ltv'))}` so'm\n\n"
+            f"🎯 VSL: `{row.get('vsl_conv_rate', 0)}%` | "
+            f"LM: `{row.get('lm_conv_rate', 0)}%` | "
+            f"Seminar: `{row.get('seminar_conv_rate', 0)}%`",
+            parse_mode="Markdown",
+        )
+    except Exception as exc:
+        logger.warning("Daily report error: %s", exc)
+
+
+async def _weekly_report(bot: Bot, sheets) -> None:
+    """Dushanba 09:00 — haftalik summary."""
+    today = date.today()
+    week_ago = (today - timedelta(days=7)).isoformat()
+    try:
+        ss = sheets._connect()
+        ws = ss.worksheet("Daily_Summary")
+        records = [r for r in ws.get_all_records() if r.get("date", "") >= week_ago]
+        if not records:
+            return
+
+        def s(f):
+            return sum(float(r.get(f, 0) or 0) for r in records)
+
+        spend = s("total_ad_spend")
+        leads = s("total_leads")
+        sales = s("total_sales")
+        revenue = s("total_revenue")
+        cac = round(spend / sales, 0) if sales else 0
+        days = len(records)
+
+        await bot.send_message(
+            FOUNDER_ID,
+            f"📅 *Haftalik hisobot* (oxirgi 7 kun)\n\n"
+            f"💸 Jami Ad Spend: `{_fmt(spend)}` so'm\n"
+            f"👥 Jami Leads: `{_fmt(leads)}`\n"
+            f"💰 Jami Sotuvlar: `{_fmt(sales)}`\n"
+            f"💵 Jami Daromad: `{_fmt(revenue)}` so'm\n"
+            f"📈 O'rtacha CAC: `{_fmt(cac)}` so'm\n\n"
+            f"📆 Kunlik o'rtacha sotuv: `{_fmt(sales/days if days else 0)}`\n"
+            f"📆 Kunlik o'rtacha daromad: `{_fmt(revenue/days if days else 0)}` so'm",
+            parse_mode="Markdown",
+        )
+    except Exception as exc:
+        logger.warning("Weekly report error: %s", exc)
 
 
 def start_scheduler(bot: Bot, sheets) -> AsyncIOScheduler:

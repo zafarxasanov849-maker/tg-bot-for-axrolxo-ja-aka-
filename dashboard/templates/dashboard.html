@@ -20,6 +20,20 @@
   </header>
 
   <main>
+    <!-- Filters -->
+    <section class="filter-bar">
+      <div class="filter-group">
+        <label>Dan:</label>
+        <input type="date" id="dateFrom"/>
+      </div>
+      <div class="filter-group">
+        <label>Gacha:</label>
+        <input type="date" id="dateTo"/>
+      </div>
+      <button class="refresh-btn" onclick="loadAll()">Qo'llash</button>
+      <button class="export-btn" onclick="exportCSV()">⬇ CSV Export</button>
+    </section>
+
     <!-- KPI Cards -->
     <section class="kpi-grid" id="kpiCards">
       <div class="kpi-card">

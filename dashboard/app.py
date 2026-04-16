@@ -8,11 +8,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for
+from flask import Flask, jsonify, render_template, request, session, redirect, url_for, Response
 from services.google_api import GoogleSheetsService
 from config import SHEET_RAW_DATA, SHEET_DAILY_SUMMARY, SHEET_LTV_COHORT
 from datetime import date, datetime
-import logging
+import csv, io, logging
 
 app = Flask(__name__)
 app.secret_key = os.getenv("DASHBOARD_SECRET", "kpi-secret-2026")
@@ -61,10 +61,18 @@ def index():
 @login_required
 def api_summary():
     try:
+        date_from = request.args.get("from", "")
+        date_to = request.args.get("to", "")
         ss = sheets._connect()
         ws = ss.worksheet(SHEET_DAILY_SUMMARY)
         records = ws.get_all_records()
-        records = sorted(records, key=lambda r: r.get("date", ""))[-30:]
+        records = sorted(records, key=lambda r: r.get("date", ""))
+        if date_from:
+            records = [r for r in records if r.get("date", "") >= date_from]
+        if date_to:
+            records = [r for r in records if r.get("date", "") <= date_to]
+        if not date_from and not date_to:
+            records = records[-30:]
         return jsonify({"ok": True, "data": records})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
@@ -133,6 +141,48 @@ def api_submit():
             sheets._upsert_ltv_sync(row)
 
         return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/export")
+@login_required
+def api_export():
+    try:
+        ss = sheets._connect()
+        ws = ss.worksheet(SHEET_RAW_DATA)
+        records = ws.get_all_records()
+        date_from = request.args.get("from", "")
+        date_to = request.args.get("to", "")
+        if date_from:
+            records = [r for r in records if str(r.get("date", "")) >= date_from]
+        if date_to:
+            records = [r for r in records if str(r.get("date", "")) <= date_to]
+        if not records:
+            return jsonify({"ok": False, "error": "Ma'lumot yo'q"}), 404
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=records[0].keys())
+        writer.writeheader()
+        writer.writerows(records)
+        filename = f"kpi_export_{date.today().isoformat()}.csv"
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/history/<int:user_id>")
+def api_history(user_id):
+    try:
+        ss = sheets._connect()
+        ws = ss.worksheet(SHEET_RAW_DATA)
+        records = ws.get_all_records()
+        user_records = [r for r in records if str(r.get("reporter_id")) == str(user_id)]
+        user_records = sorted(user_records, key=lambda r: r.get("date", ""), reverse=True)[:10]
+        return jsonify({"ok": True, "data": user_records})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 

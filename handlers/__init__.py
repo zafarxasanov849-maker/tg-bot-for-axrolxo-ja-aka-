@@ -3,6 +3,7 @@ from .vsl import router as vsl_router
 from .lead_magnet import router as lead_magnet_router
 from .seminar import router as seminar_router
 from .sales import router as sales_router
+from .stats import router as stats_router
 
 __all__ = [
     "common_router",
@@ -10,4 +11,5 @@ __all__ = [
     "lead_magnet_router",
     "seminar_router",
     "sales_router",
+    "stats_router",
 ]

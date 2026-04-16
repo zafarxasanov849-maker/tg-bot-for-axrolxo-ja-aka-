@@ -49,8 +49,22 @@ function makeChart(id, type, labels, datasets, opts = {}) {
   });
 }
 
+function getDateParams() {
+  const from = document.getElementById('dateFrom')?.value;
+  const to = document.getElementById('dateTo')?.value;
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  return params.toString() ? '?' + params.toString() : '';
+}
+
+function exportCSV() {
+  const params = getDateParams();
+  window.location.href = '/api/export' + params;
+}
+
 async function loadSummary() {
-  const res = await fetch('/api/summary');
+  const res = await fetch('/api/summary' + getDateParams());
   const json = await res.json();
   if (!json.ok || !json.data.length) return;
 
