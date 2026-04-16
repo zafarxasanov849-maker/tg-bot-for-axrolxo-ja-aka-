@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KPI & LTV Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/dashboard.css"/>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">📊 KPI & LTV Dashboard</div>
+      <div class="subtitle">Tizimchiman kursi — Kunlik hisobot</div>
+      <button class="refresh-btn" onclick="loadAll()">&#8635; Yangilash</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- KPI Cards -->
+    <section class="kpi-grid" id="kpiCards">
+      <div class="kpi-card">
+        <div class="kpi-label">Bugungi Sotuv</div>
+        <div class="kpi-value" id="todaySales">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bugungi Daromad</div>
+        <div class="kpi-value" id="todayRevenue">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bugungi Leads</div>
+        <div class="kpi-value" id="todayLeads">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bugungi Ad Spend</div>
+        <div class="kpi-value" id="todaySpend">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Blended CAC</div>
+        <div class="kpi-value" id="todayCAC">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">O'rtacha LTV</div>
+        <div class="kpi-value" id="avgLTV">—</div>
+      </div>
+    </section>
+
+    <!-- Charts Row 1 -->
+    <section class="charts-row">
+      <div class="chart-box">
+        <h3>Daromad (30 kun)</h3>
+        <canvas id="revenueChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Leads & Sotuvlar</h3>
+        <canvas id="leadsSalesChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Charts Row 2 -->
+    <section class="charts-row">
+      <div class="chart-box">
+        <h3>Ad Spend vs CAC</h3>
+        <canvas id="spendCacChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Konversiya (VSL / LM / Seminar)</h3>
+        <canvas id="convChart"></canvas>
+      </div>
+    </section>
+
+    <!-- LTV Table -->
+    <section class="table-section">
+      <h3>LTV Cohort — Mijozlar</h3>
+      <div class="table-wrap">
+        <table id="ltvTable">
+          <thead>
+            <tr>
+              <th>Mijoz ID</th>
+              <th>Manba</th>
+              <th>1-xarid</th>
+              <th>Jami daromad</th>
+              <th>Xaridlar soni</th>
+              <th>LTV</th>
+            </tr>
+          </thead>
+          <tbody id="ltvBody">
+            <tr><td colspan="6" class="loading">Yuklanmoqda...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>
