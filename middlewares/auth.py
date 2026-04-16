@@ -22,7 +22,7 @@ class AuthMiddleware(BaseMiddleware):
                 target = event.message if isinstance(event, CallbackQuery) else event
                 await target.answer(
                     "⛔ Sizga bu botdan foydalanish huquqi yo'q.\n"
-                    "Murojaat uchun: @admin"
+                    "Murojaat uchun: @khasanov_zafar"
                 )
             return
 
