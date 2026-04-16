@@ -1,7 +1,10 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Always load .env from the same directory as this file
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
@@ -19,7 +22,8 @@ WHITELIST: dict[int, str] = {
 }
 
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
-SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_ACCOUNT_FILE", "service_account.json")
+_sa_file = os.getenv("SERVICE_ACCOUNT_FILE", "service_account.json")
+SERVICE_ACCOUNT_FILE = str(BASE_DIR / _sa_file) if not os.path.isabs(_sa_file) else _sa_file
 GDRIVE_FOLDER_ID = os.getenv("GDRIVE_FOLDER_ID")
 
 # Sheet tab names
