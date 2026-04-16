@@ -33,6 +33,17 @@ header {
   transition: opacity 0.2s;
 }
 .refresh-btn:hover { opacity: 0.85; }
+.logout-btn {
+  background: transparent;
+  color: #8892a4;
+  border: 1px solid #2d3148;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.logout-btn:hover { color: #f87171; border-color: #f87171; }
 
 main {
   max-width: 1400px;

@@ -8,31 +8,56 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request, session, redirect, url_for
 from services.google_api import GoogleSheetsService
 from config import SHEET_RAW_DATA, SHEET_DAILY_SUMMARY, SHEET_LTV_COHORT
-import asyncio
 import logging
 
 app = Flask(__name__)
+app.secret_key = os.getenv("DASHBOARD_SECRET", "kpi-secret-2026")
+DASHBOARD_USER = os.getenv("DASHBOARD_USER", "admin")
+DASHBOARD_PASS = os.getenv("DASHBOARD_PASS", "admin123")
+
 logging.basicConfig(level=logging.INFO)
 sheets = GoogleSheetsService()
 
 
-def run_sync(coro):
-    loop = asyncio.new_event_loop()
-    try:
-        return loop.run_until_complete(coro)
-    finally:
-        loop.close()
+def login_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get("logged_in"):
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        if (request.form.get("username") == DASHBOARD_USER and
+                request.form.get("password") == DASHBOARD_PASS):
+            session["logged_in"] = True
+            return redirect(url_for("index"))
+        error = "Login yoki parol noto'g'ri"
+    return render_template("login.html", error=error)
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 
 @app.route("/")
+@login_required
 def index():
     return render_template("dashboard.html")
 
 
 @app.route("/api/summary")
+@login_required
 def api_summary():
     try:
         ss = sheets._connect()
@@ -45,6 +70,7 @@ def api_summary():
 
 
 @app.route("/api/ltv")
+@login_required
 def api_ltv():
     try:
         ss = sheets._connect()
@@ -56,6 +82,7 @@ def api_ltv():
 
 
 @app.route("/api/raw")
+@login_required
 def api_raw():
     try:
         ss = sheets._connect()
