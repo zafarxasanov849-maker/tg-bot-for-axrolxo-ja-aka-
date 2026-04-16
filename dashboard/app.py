@@ -149,6 +149,7 @@ def api_submit():
 @login_required
 def api_export():
     try:
+        from services.google_api import RAW_HEADERS
         ss = sheets._connect()
         ws = ss.worksheet(SHEET_RAW_DATA)
         records = ws.get_all_records()
@@ -158,16 +159,16 @@ def api_export():
             records = [r for r in records if str(r.get("date", "")) >= date_from]
         if date_to:
             records = [r for r in records if str(r.get("date", "")) <= date_to]
-        if not records:
-            return jsonify({"ok": False, "error": "Ma'lumot yo'q"}), 404
         output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=records[0].keys())
+        fieldnames = records[0].keys() if records else RAW_HEADERS
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(records)
+        if records:
+            writer.writerows(records)
         filename = f"kpi_export_{date.today().isoformat()}.csv"
         return Response(
-            output.getvalue(),
-            mimetype="text/csv",
+            "\ufeff" + output.getvalue(),  # BOM for Excel UTF-8
+            mimetype="text/csv; charset=utf-8",
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
