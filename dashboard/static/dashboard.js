@@ -170,6 +170,65 @@ async function loadLTV() {
   `).join('');
 }
 
+async function loadFunnelComparison() {
+  const res = await fetch('/api/funnel_comparison' + getDateParams());
+  const json = await res.json();
+  if (!json.ok) return;
+  const d = json.data;
+
+  // Overall ROI
+  document.getElementById('overallROI').textContent = d.overall_roi + 'x';
+  document.getElementById('roiSub').textContent =
+    `${fmtMoney(d.total_revenue)} / ${fmtMoney(d.total_spend)}`;
+
+  // VSL
+  const v = d.vsl;
+  document.getElementById('vsl_spend').textContent = fmtMoney(v.ad_spend);
+  document.getElementById('vsl_views').textContent = fmt(v.page_views);
+  document.getElementById('vsl_starts').textContent = fmt(v.video_start);
+  document.getElementById('vsl_cta').textContent = fmt(v.cta_clicks);
+  document.getElementById('vsl_conv').textContent = v.view_to_cta + '%';
+  document.getElementById('vsl_sales').textContent = fmt(v.sales);
+  document.getElementById('vsl_revenue').textContent = fmtMoney(v.revenue);
+  document.getElementById('vsl_roi').textContent = v.roi + 'x';
+
+  // Lead Magnet
+  const l = d.lead_magnet;
+  document.getElementById('lm_spend').textContent = fmtMoney(l.ad_spend);
+  document.getElementById('lm_views').textContent = fmt(l.lp_views);
+  document.getElementById('lm_leads').textContent = fmt(l.new_leads);
+  document.getElementById('lm_lead_conv').textContent = l.lead_conv + '%';
+  document.getElementById('lm_contact').textContent = fmt(l.contacted);
+  document.getElementById('lm_contact_conv').textContent = l.contact_conv + '%';
+  document.getElementById('lm_sales').textContent = fmt(l.sales);
+  document.getElementById('lm_revenue').textContent = fmtMoney(l.revenue);
+  document.getElementById('lm_roi').textContent = l.roi + 'x';
+
+  // Seminar
+  const s = d.seminar;
+  document.getElementById('sem_spend').textContent = fmtMoney(s.ad_spend);
+  document.getElementById('sem_reg').textContent = fmt(s.registrations);
+  document.getElementById('sem_show').textContent = fmt(s.show_up);
+  document.getElementById('sem_show_conv').textContent = s.show_rate + '%';
+  document.getElementById('sem_dep').textContent = fmt(s.deposits);
+  document.getElementById('sem_sales').textContent = fmt(s.sales);
+  document.getElementById('sem_close_conv').textContent = s.close_rate + '%';
+  document.getElementById('sem_full').textContent = fmt(s.full_payments);
+  document.getElementById('sem_revenue').textContent = fmtMoney(s.revenue);
+  document.getElementById('sem_roi').textContent = s.roi + 'x';
+
+  // Funnel ROI bar chart
+  makeChart('funnelRoiChart', 'bar',
+    ['VSL', 'Lead Magnet', 'Seminar'],
+    [{
+      label: 'ROI (x)',
+      data: [v.roi, l.roi, s.roi],
+      backgroundColor: ['rgba(245,166,35,0.7)', 'rgba(78,142,247,0.7)', 'rgba(52,211,153,0.7)'],
+      borderRadius: 6,
+    }]
+  );
+}
+
 async function loadAll() {
   document.getElementById('todaySales').textContent = '...';
   document.getElementById('todayRevenue').textContent = '...';
@@ -177,7 +236,8 @@ async function loadAll() {
   document.getElementById('todaySpend').textContent = '...';
   document.getElementById('todayCAC').textContent = '...';
   document.getElementById('avgLTV').textContent = '...';
-  await Promise.all([loadSummary(), loadLTV()]);
+  document.getElementById('overallROI').textContent = '...';
+  await Promise.all([loadSummary(), loadLTV(), loadFunnelComparison()]);
 }
 
 loadAll();

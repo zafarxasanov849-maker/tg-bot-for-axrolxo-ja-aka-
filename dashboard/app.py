@@ -145,6 +145,95 @@ def api_submit():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+@app.route("/api/funnel_comparison")
+@login_required
+def api_funnel_comparison():
+    try:
+        ss = sheets._connect()
+        ws = ss.worksheet(SHEET_RAW_DATA)
+        records = ws.get_all_records()
+
+        date_from = request.args.get("from", "")
+        date_to = request.args.get("to", "")
+        if date_from:
+            records = [r for r in records if str(r.get("date", "")) >= date_from]
+        if date_to:
+            records = [r for r in records if str(r.get("date", "")) <= date_to]
+
+        def sf(v):
+            try: return float(v) if v != "" else 0.0
+            except: return 0.0
+
+        def pct(num, den):
+            return round(num / den * 100, 1) if den else 0.0
+
+        # VSL
+        vsl = [r for r in records if r.get("funnel_type") == "VSL"]
+        vsl_spend   = sum(sf(r.get("ad_spend")) for r in vsl)
+        vsl_views   = sum(sf(r.get("page_views")) for r in vsl)
+        vsl_starts  = sum(sf(r.get("video_start")) for r in vsl)
+        vsl_cta     = sum(sf(r.get("cta_clicks")) for r in vsl)
+        vsl_revenue = sum(sf(r.get("price")) for r in records if r.get("funnel_source") == "VSL")
+        vsl_sales   = sum(sf(r.get("sales_count")) for r in vsl)
+
+        # Lead Magnet
+        lm = [r for r in records if r.get("funnel_type") == "Lead_Magnet"]
+        lm_spend   = sum(sf(r.get("ad_spend")) for r in lm)
+        lm_views   = sum(sf(r.get("lp_views")) for r in lm)
+        lm_leads   = sum(sf(r.get("new_leads")) for r in lm)
+        lm_contact = sum(sf(r.get("contacted")) for r in lm)
+        lm_revenue = sum(sf(r.get("price")) for r in records if r.get("funnel_source") == "Lead_Magnet")
+        lm_sales   = sum(sf(r.get("sales_count")) for r in lm)
+
+        # Seminar
+        sem = [r for r in records if r.get("funnel_type") == "Seminar"]
+        sem_spend  = sum(sf(r.get("ad_spend")) for r in sem)
+        sem_reg    = sum(sf(r.get("registrations")) for r in sem)
+        sem_show   = sum(sf(r.get("show_up")) for r in sem)
+        sem_dep    = sum(sf(r.get("deposits")) for r in sem)
+        sem_sales  = sum(sf(r.get("sales_count")) for r in sem)
+        sem_full   = sum(sf(r.get("full_payments")) for r in sem)
+        sem_revenue= sum(sf(r.get("price")) for r in records if r.get("funnel_source") == "Seminar")
+
+        # Overall ROI
+        total_spend   = vsl_spend + lm_spend + sem_spend
+        total_revenue = vsl_revenue + lm_revenue + sem_revenue
+        overall_roi   = round(total_revenue / total_spend, 2) if total_spend else 0
+
+        result = {
+            "overall_roi": overall_roi,
+            "total_spend": total_spend,
+            "total_revenue": total_revenue,
+            "vsl": {
+                "ad_spend": vsl_spend, "page_views": vsl_views,
+                "video_start": vsl_starts, "cta_clicks": vsl_cta,
+                "sales": vsl_sales, "revenue": vsl_revenue,
+                "view_to_cta": pct(vsl_cta, vsl_views),
+                "roi": round(vsl_revenue / vsl_spend, 2) if vsl_spend else 0,
+            },
+            "lead_magnet": {
+                "ad_spend": lm_spend, "lp_views": lm_views,
+                "new_leads": lm_leads, "contacted": lm_contact,
+                "sales": lm_sales, "revenue": lm_revenue,
+                "lead_conv": pct(lm_leads, lm_views),
+                "contact_conv": pct(lm_contact, lm_leads),
+                "roi": round(lm_revenue / lm_spend, 2) if lm_spend else 0,
+            },
+            "seminar": {
+                "ad_spend": sem_spend, "registrations": sem_reg,
+                "show_up": sem_show, "deposits": sem_dep,
+                "sales": sem_sales, "full_payments": sem_full,
+                "revenue": sem_revenue,
+                "show_rate": pct(sem_show, sem_reg),
+                "close_rate": pct(sem_sales, sem_show),
+                "roi": round(sem_revenue / sem_spend, 2) if sem_spend else 0,
+            },
+        }
+        return jsonify({"ok": True, "data": result})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 @app.route("/api/export")
 @login_required
 def api_export():

@@ -35,21 +35,21 @@
     </section>
 
     <!-- KPI Cards -->
-    <section class="kpi-grid" id="kpiCards">
+    <section class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-label">Bugungi Sotuv</div>
+        <div class="kpi-label">Jami Sotuv</div>
         <div class="kpi-value" id="todaySales">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Bugungi Daromad</div>
+        <div class="kpi-label">Jami Daromad</div>
         <div class="kpi-value" id="todayRevenue">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Bugungi Leads</div>
+        <div class="kpi-label">Jami Leads</div>
         <div class="kpi-value" id="todayLeads">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Bugungi Ad Spend</div>
+        <div class="kpi-label">Jami Ad Spend</div>
         <div class="kpi-value" id="todaySpend">—</div>
       </div>
       <div class="kpi-card">
@@ -60,12 +60,17 @@
         <div class="kpi-label">O'rtacha LTV</div>
         <div class="kpi-value" id="avgLTV">—</div>
       </div>
+      <div class="kpi-card roi-card">
+        <div class="kpi-label">Umumiy ROI</div>
+        <div class="kpi-value" id="overallROI">—</div>
+        <div class="kpi-sub" id="roiSub">—</div>
+      </div>
     </section>
 
     <!-- Charts Row 1 -->
     <section class="charts-row">
       <div class="chart-box">
-        <h3>Daromad (30 kun)</h3>
+        <h3>Daromad dinamikasi</h3>
         <canvas id="revenueChart"></canvas>
       </div>
       <div class="chart-box">
@@ -81,24 +86,99 @@
         <canvas id="spendCacChart"></canvas>
       </div>
       <div class="chart-box">
-        <h3>Konversiya (VSL / LM / Seminar)</h3>
+        <h3>Konversiya % (VSL / LM / Seminar)</h3>
         <canvas id="convChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Funnel Comparison -->
+    <section class="table-section">
+      <h3>🔀 Funnel Taqqoslash</h3>
+
+      <!-- VSL -->
+      <div class="funnel-block">
+        <div class="funnel-header">📹 VSL Voronkasi</div>
+        <div class="funnel-metrics" id="vslMetrics">
+          <div class="metric-row">
+            <span>Ad Spend</span><span id="vsl_spend">—</span>
+          </div>
+          <div class="metric-row">
+            <span>Sahifa ko'rishlar</span><span id="vsl_views">—</span>
+          </div>
+          <div class="metric-row">
+            <span>Video boshlash</span><span id="vsl_starts">—</span>
+          </div>
+          <div class="metric-row">
+            <span>CTA bosilish</span><span id="vsl_cta">—</span>
+          </div>
+          <div class="metric-row">
+            <span>Ko'rish → CTA konversiya</span><span class="conv-badge" id="vsl_conv">—</span>
+          </div>
+          <div class="metric-row">
+            <span>Sotuvlar</span><span id="vsl_sales">—</span>
+          </div>
+          <div class="metric-row">
+            <span>Daromad</span><span id="vsl_revenue">—</span>
+          </div>
+          <div class="metric-row highlight">
+            <span>ROI</span><span class="roi-badge" id="vsl_roi">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lead Magnet -->
+      <div class="funnel-block">
+        <div class="funnel-header">🧲 Lead Magnet</div>
+        <div class="funnel-metrics">
+          <div class="metric-row"><span>Ad Spend</span><span id="lm_spend">—</span></div>
+          <div class="metric-row"><span>LP Ko'rishlar</span><span id="lm_views">—</span></div>
+          <div class="metric-row"><span>Yangi Leadlar</span><span id="lm_leads">—</span></div>
+          <div class="metric-row"><span>Ko'rish → Lead konversiya</span><span class="conv-badge" id="lm_lead_conv">—</span></div>
+          <div class="metric-row"><span>Bog'lanilganlar</span><span id="lm_contact">—</span></div>
+          <div class="metric-row"><span>Lead → Aloqa konversiya</span><span class="conv-badge" id="lm_contact_conv">—</span></div>
+          <div class="metric-row"><span>Sotuvlar</span><span id="lm_sales">—</span></div>
+          <div class="metric-row"><span>Daromad</span><span id="lm_revenue">—</span></div>
+          <div class="metric-row highlight">
+            <span>ROI</span><span class="roi-badge" id="lm_roi">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seminar -->
+      <div class="funnel-block">
+        <div class="funnel-header">🎓 Seminar</div>
+        <div class="funnel-metrics">
+          <div class="metric-row"><span>Ad Spend</span><span id="sem_spend">—</span></div>
+          <div class="metric-row"><span>Ro'yxatdan o'tganlar</span><span id="sem_reg">—</span></div>
+          <div class="metric-row"><span>Kelganlar</span><span id="sem_show">—</span></div>
+          <div class="metric-row"><span>Kelish konversiyasi</span><span class="conv-badge" id="sem_show_conv">—</span></div>
+          <div class="metric-row"><span>Depozitlar</span><span id="sem_dep">—</span></div>
+          <div class="metric-row"><span>Sotuvlar</span><span id="sem_sales">—</span></div>
+          <div class="metric-row"><span>Yopish konversiyasi</span><span class="conv-badge" id="sem_close_conv">—</span></div>
+          <div class="metric-row"><span>To'liq to'lovlar</span><span id="sem_full">—</span></div>
+          <div class="metric-row"><span>Daromad</span><span id="sem_revenue">—</span></div>
+          <div class="metric-row highlight">
+            <span>ROI</span><span class="roi-badge" id="sem_roi">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Funnel bar chart -->
+      <div class="chart-box" style="margin-top:20px">
+        <h3>Funnel ROI taqqoslash</h3>
+        <canvas id="funnelRoiChart"></canvas>
       </div>
     </section>
 
     <!-- LTV Table -->
     <section class="table-section">
-      <h3>LTV Cohort — Mijozlar</h3>
+      <h3>👥 LTV Cohort — Mijozlar</h3>
       <div class="table-wrap">
         <table id="ltvTable">
           <thead>
             <tr>
-              <th>Mijoz ID</th>
-              <th>Manba</th>
-              <th>1-xarid</th>
-              <th>Jami daromad</th>
-              <th>Xaridlar soni</th>
-              <th>LTV</th>
+              <th>Mijoz ID</th><th>Manba</th><th>1-xarid</th>
+              <th>Jami daromad</th><th>Xaridlar soni</th><th>LTV</th>
             </tr>
           </thead>
           <tbody id="ltvBody">

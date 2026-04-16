@@ -58,6 +58,37 @@ async def cmd_bugun(message: Message, role: str) -> None:
         await message.answer(f"❌ Xato: {e}")
 
 
+@router.message(Command("mening_hisobotim"))
+async def cmd_my_report(message: Message, role: str) -> None:
+    today = date.today().isoformat()
+    try:
+        ss = sheets_service._connect()
+        ws = ss.worksheet("Raw_Data")
+        records = ws.get_all_records()
+        my_records = [r for r in records if str(r.get("reporter_id")) == str(message.from_user.id)]
+        today_records = [r for r in my_records if r.get("date") == today]
+        total_days = len(set(r.get("date") for r in my_records))
+
+        if not my_records:
+            await message.answer("Siz hali hech qanday hisobot topshirmadingiz.", parse_mode="Markdown")
+            return
+
+        status = "✅ Bugun kiritilgan" if today_records else "❌ Bugun hali kiritilmagan"
+        funnels = ", ".join(set(r.get("funnel_type","") for r in today_records)) if today_records else "—"
+
+        await message.answer(
+            f"👤 *Mening hisobotim*\n\n"
+            f"Bugun: {status}\n"
+            f"Kiritilgan funnel: {funnels}\n\n"
+            f"📆 Jami hisobot kunlari: *{total_days}*\n"
+            f"📋 Jami yozuvlar: *{len(my_records)}*\n\n"
+            f"Yangi hisobot: /start",
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        await message.answer(f"❌ Xato: {e}")
+
+
 @router.message(Command("hafta"))
 async def cmd_hafta(message: Message, role: str) -> None:
     try:

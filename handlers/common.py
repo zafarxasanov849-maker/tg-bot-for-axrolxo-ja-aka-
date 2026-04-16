@@ -43,7 +43,10 @@ async def cmd_start(message: Message, state: FSMContext, role: str) -> None:
     await state.clear()
     await message.answer(
         f"Salom! Rolingiz: *{role}*\n\n"
-        "Qaysi voronka bo'yicha hisobot berasiz?",
+        "Qaysi voronka bo'yicha hisobot berasiz?\n\n"
+        "📋 /mening\\_hisobotim — shaxsiy statistika\n"
+        "📊 /bugun — bugungi KPI\n"
+        "📅 /hafta — haftalik hisobot",
         reply_markup=FUNNEL_KEYBOARD,
         parse_mode="Markdown",
     )
