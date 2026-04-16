@@ -20,6 +20,8 @@ from config import (
     DIRECT_MANAGER_ID,
     NUDGE_HOUR,
     ESCALATE_HOUR,
+    FINAL_NUDGE_HOUR,
+    FINAL_NUDGE_MINUTE,
     TIMEZONE,
     SPREADSHEET_ID,
 )
@@ -53,6 +55,14 @@ def _build_scheduler(bot: Bot, sheets) -> AsyncIOScheduler:
         replace_existing=True,
     )
 
+    scheduler.add_job(
+        _final_nudge,
+        CronTrigger(hour=FINAL_NUDGE_HOUR, minute=FINAL_NUDGE_MINUTE, timezone=TIMEZONE),
+        args=[bot, sheets],
+        id="final_nudge",
+        replace_existing=True,
+    )
+
     return scheduler
 
 
@@ -83,6 +93,44 @@ async def _nudge_missing(bot: Bot, sheets) -> None:
                 logger.info("Nudged %s (%s)", name, uid)
             except Exception as exc:
                 logger.warning("Could not nudge %s: %s", name, exc)
+
+
+async def _final_nudge(bot: Bot, sheets) -> None:
+    """23:50 — oxirgi eslatma. Kiritmaganlar + Founder ga xabar."""
+    today = date.today().isoformat()
+    submitted_ids = await sheets.get_submitted_reporter_ids(today)
+
+    missing = [(name, uid) for name, uid in REPORTERS.items() if uid not in submitted_ids]
+    if not missing:
+        return
+
+    # Kiritmaganlarga shaxsiy xabar
+    for name, uid in missing:
+        try:
+            await bot.send_message(
+                uid,
+                f"🚨 *Oxirgi eslatma! 23:50*\n\n"
+                f"Bugun ({today}) hisobotingiz hali kiritilmagan!\n"
+                f"Kun tugashidan oldin kiriting 👇\n\n"
+                f"/start",
+                parse_mode="Markdown",
+            )
+        except Exception as exc:
+            logger.warning("Could not final-nudge %s: %s", name, exc)
+
+    # Founder ga ham xabar
+    names_str = "\n".join(f"  • {n}" for n, _ in missing)
+    try:
+        await bot.send_message(
+            FOUNDER_ID,
+            f"🚨 *23:50 — Hisobot kiritilmadi!*\n"
+            f"Sana: {today}\n\n"
+            f"Quyidagilar hali hisobot bermagandi:\n{names_str}\n\n"
+            f"Tez orada kiritishlari kerak.",
+            parse_mode="Markdown",
+        )
+    except Exception as exc:
+        logger.warning("Could not notify founder at final nudge: %s", exc)
 
 
 async def _escalate_missing(bot: Bot, sheets) -> None:

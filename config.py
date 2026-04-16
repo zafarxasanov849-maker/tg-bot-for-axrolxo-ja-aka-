@@ -35,7 +35,9 @@ SHEET_DAILY_SUMMARY = "Daily_Summary"
 # Anomaly detection threshold (30%)
 ANOMALY_THRESHOLD = 0.30
 
-# Scheduler times (UTC+5 → UTC offset handled in scheduler)
-NUDGE_HOUR = 20   # 20:00 local
-ESCALATE_HOUR = 21  # 21:00 local
+# Scheduler times (Asia/Tashkent)
+NUDGE_HOUR = 20        # 20:00 — birinchi eslatma
+ESCALATE_HOUR = 21     # 21:00 — Founder ga eskalatsiya
+FINAL_NUDGE_HOUR = 23  # 23:50 — oxirgi eslatma (kech ishlaydiganlar uchun)
+FINAL_NUDGE_MINUTE = 50
 TIMEZONE = "Asia/Tashkent"
