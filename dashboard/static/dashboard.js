@@ -84,12 +84,11 @@ async function loadTotals() {
   if (!json.ok) return;
   const d = json.data;
 
-  document.getElementById('tot_sales').textContent   = fmt(d.total_sales);
   document.getElementById('tot_revenue').textContent = fmtMoney(d.total_revenue);
+  document.getElementById('tot_sales').textContent   = fmt(d.total_sales);
   document.getElementById('tot_leads').textContent   = fmt(d.total_leads);
   document.getElementById('tot_spend').textContent   = fmtMoney(d.total_ad_spend);
   document.getElementById('tot_cac').textContent     = fmtMoney(d.blended_cac);
-  document.getElementById('tot_ltv').textContent     = fmtMoney(d.avg_ltv);
   document.getElementById('tot_roi').textContent     = d.overall_roi + 'x';
   document.getElementById('tot_roi_sub').textContent =
     `${fmtMoney(d.total_revenue)} / ${fmtMoney(d.total_ad_spend)}`;
@@ -167,7 +166,7 @@ async function loadLTV() {
 }
 
 async function loadUmumiy() {
-  ['tot_sales','tot_revenue','tot_leads','tot_spend','tot_cac','tot_ltv','tot_roi','tot_days']
+  ['tot_revenue','tot_sales','tot_leads','tot_spend','tot_cac','tot_roi','tot_days']
     .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '...'; });
   await Promise.all([loadTotals(), loadFunnelComparison(), loadLTV()]);
 }

@@ -117,7 +117,85 @@ main {
 }
 .export-btn:hover { background: rgba(52,211,153,0.1); }
 
-/* KPI Cards */
+/* ── KPI Hero (Umumiy tab) ─────────────────────────────────────────── */
+.kpi-hero {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 900px)  { .kpi-hero { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px)  { .kpi-hero { grid-template-columns: 1fr; } }
+
+.kc {
+  background: #1a1d2e;
+  border: 1px solid #2d3148;
+  border-radius: 16px;
+  padding: 22px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.kc::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--cc, #F5A623);
+  border-radius: 16px 16px 0 0;
+}
+.kc:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  border-color: var(--cc, #F5A623);
+}
+.kc-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+.kc-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--cc, #F5A623);
+  letter-spacing: -0.02em;
+}
+.kc-label {
+  font-size: 0.72rem;
+  color: #8892a4;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.kc-sub {
+  font-size: 0.78rem;
+  color: #8892a4;
+  margin-top: 2px;
+}
+
+/* Color variants */
+.kc-revenue { --cc: #F5A623; }
+.kc-sales   { --cc: #34d399; }
+.kc-leads   { --cc: #4e8ef7; }
+.kc-spend   { --cc: #f87171; }
+.kc-cac     { --cc: #a78bfa; }
+.kc-days    { --cc: #64748b; }
+
+/* Featured ROI card */
+.kc-roi {
+  --cc: #F5A623;
+  grid-column: span 2;
+  background: linear-gradient(135deg, #1e2235 0%, rgba(245,166,35,0.06) 100%);
+  border-color: rgba(245,166,35,0.35);
+}
+.kc-roi .kc-value { font-size: 3rem; }
+@media (max-width: 900px) { .kc-roi { grid-column: span 2; } }
+@media (max-width: 500px) { .kc-roi { grid-column: span 1; } .kc-roi .kc-value { font-size: 2rem; } }
+
+/* ── KPI Grid (Kunlik tab) ─────────────────────────────────────────── */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
