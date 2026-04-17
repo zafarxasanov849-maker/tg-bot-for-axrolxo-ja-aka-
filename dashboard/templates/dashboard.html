@@ -14,179 +14,229 @@
     <div class="header-inner">
       <div class="logo">📊 KPI & LTV Dashboard</div>
       <div class="subtitle">Tizimchiman kursi — Kunlik hisobot</div>
-      <button class="refresh-btn" onclick="loadAll()">&#8635; Yangilash</button>
+      <button class="refresh-btn" onclick="reloadActive()">&#8635; Yangilash</button>
       <a href="/logout" class="logout-btn">Chiqish</a>
     </div>
   </header>
 
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <div class="tabs-inner">
+      <button class="tab-btn active" id="tab-umumiy" onclick="switchTab('umumiy')">📊 Umumiy</button>
+      <button class="tab-btn" id="tab-kunlik" onclick="switchTab('kunlik')">📅 Kunlik</button>
+    </div>
+  </div>
+
   <main>
-    <!-- Filters -->
-    <section class="filter-bar">
-      <div class="filter-group">
-        <label>Dan:</label>
-        <input type="date" id="dateFrom"/>
-      </div>
-      <div class="filter-group">
-        <label>Gacha:</label>
-        <input type="date" id="dateTo"/>
-      </div>
-      <button class="refresh-btn" onclick="loadAll()">Qo'llash</button>
-      <button class="export-btn" onclick="exportCSV()">⬇ CSV Export</button>
-    </section>
 
-    <!-- KPI Cards -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Jami Sotuv</div>
-        <div class="kpi-value" id="todaySales">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Jami Daromad</div>
-        <div class="kpi-value" id="todayRevenue">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Jami Leads</div>
-        <div class="kpi-value" id="todayLeads">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Jami Ad Spend</div>
-        <div class="kpi-value" id="todaySpend">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Blended CAC</div>
-        <div class="kpi-value" id="todayCAC">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">O'rtacha LTV</div>
-        <div class="kpi-value" id="avgLTV">—</div>
-      </div>
-      <div class="kpi-card roi-card">
-        <div class="kpi-label">Umumiy ROI</div>
-        <div class="kpi-value" id="overallROI">—</div>
-        <div class="kpi-sub" id="roiSub">—</div>
-      </div>
-    </section>
+    <!-- ===================== UMUMIY TAB ===================== -->
+    <div id="panel-umumiy">
 
-    <!-- Charts Row 1 -->
-    <section class="charts-row">
-      <div class="chart-box">
-        <h3>Daromad dinamikasi</h3>
-        <canvas id="revenueChart"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Leads & Sotuvlar</h3>
-        <canvas id="leadsSalesChart"></canvas>
-      </div>
-    </section>
+      <!-- KPI Cards — All-time totals -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Jami Sotuv</div>
+          <div class="kpi-value" id="tot_sales">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Jami Daromad</div>
+          <div class="kpi-value" id="tot_revenue">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Jami Leads</div>
+          <div class="kpi-value" id="tot_leads">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Jami Ad Spend</div>
+          <div class="kpi-value" id="tot_spend">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Blended CAC</div>
+          <div class="kpi-value" id="tot_cac">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">O'rtacha LTV</div>
+          <div class="kpi-value" id="tot_ltv">—</div>
+        </div>
+        <div class="kpi-card roi-card">
+          <div class="kpi-label">Umumiy ROI</div>
+          <div class="kpi-value" id="tot_roi">—</div>
+          <div class="kpi-sub" id="tot_roi_sub">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Hisobot kunlari</div>
+          <div class="kpi-value" id="tot_days">—</div>
+        </div>
+      </section>
 
-    <!-- Charts Row 2 -->
-    <section class="charts-row">
-      <div class="chart-box">
-        <h3>Ad Spend vs CAC</h3>
-        <canvas id="spendCacChart"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Konversiya % (VSL / LM / Seminar)</h3>
-        <canvas id="convChart"></canvas>
-      </div>
-    </section>
+      <!-- Funnel Comparison -->
+      <section class="table-section">
+        <h3>🔀 Funnel Taqqoslash</h3>
 
-    <!-- Funnel Comparison -->
-    <section class="table-section">
-      <h3>🔀 Funnel Taqqoslash</h3>
-
-      <!-- VSL -->
-      <div class="funnel-block">
-        <div class="funnel-header">📹 VSL Voronkasi</div>
-        <div class="funnel-metrics" id="vslMetrics">
-          <div class="metric-row">
-            <span>Ad Spend</span><span id="vsl_spend">—</span>
-          </div>
-          <div class="metric-row">
-            <span>Sahifa ko'rishlar</span><span id="vsl_views">—</span>
-          </div>
-          <div class="metric-row">
-            <span>Video boshlash</span><span id="vsl_starts">—</span>
-          </div>
-          <div class="metric-row">
-            <span>CTA bosilish</span><span id="vsl_cta">—</span>
-          </div>
-          <div class="metric-row">
-            <span>Ko'rish → CTA konversiya</span><span class="conv-badge" id="vsl_conv">—</span>
-          </div>
-          <div class="metric-row">
-            <span>Sotuvlar</span><span id="vsl_sales">—</span>
-          </div>
-          <div class="metric-row">
-            <span>Daromad</span><span id="vsl_revenue">—</span>
-          </div>
-          <div class="metric-row highlight">
-            <span>ROI</span><span class="roi-badge" id="vsl_roi">—</span>
+        <div class="funnel-block">
+          <div class="funnel-header">📹 VSL Voronkasi</div>
+          <div class="funnel-metrics">
+            <div class="metric-row"><span>Ad Spend</span><span id="vsl_spend">—</span></div>
+            <div class="metric-row"><span>Sahifa ko'rishlar</span><span id="vsl_views">—</span></div>
+            <div class="metric-row"><span>Video boshlash</span><span id="vsl_starts">—</span></div>
+            <div class="metric-row"><span>CTA bosilish</span><span id="vsl_cta">—</span></div>
+            <div class="metric-row"><span>Ko'rish → CTA konversiya</span><span class="conv-badge" id="vsl_conv">—</span></div>
+            <div class="metric-row"><span>Sotuvlar</span><span id="vsl_sales">—</span></div>
+            <div class="metric-row"><span>Daromad</span><span id="vsl_revenue">—</span></div>
+            <div class="metric-row highlight"><span>ROI</span><span class="roi-badge" id="vsl_roi">—</span></div>
           </div>
         </div>
-      </div>
 
-      <!-- Lead Magnet -->
-      <div class="funnel-block">
-        <div class="funnel-header">🧲 Lead Magnet</div>
-        <div class="funnel-metrics">
-          <div class="metric-row"><span>Ad Spend</span><span id="lm_spend">—</span></div>
-          <div class="metric-row"><span>LP Ko'rishlar</span><span id="lm_views">—</span></div>
-          <div class="metric-row"><span>Yangi Leadlar</span><span id="lm_leads">—</span></div>
-          <div class="metric-row"><span>Ko'rish → Lead konversiya</span><span class="conv-badge" id="lm_lead_conv">—</span></div>
-          <div class="metric-row"><span>Bog'lanilganlar</span><span id="lm_contact">—</span></div>
-          <div class="metric-row"><span>Lead → Aloqa konversiya</span><span class="conv-badge" id="lm_contact_conv">—</span></div>
-          <div class="metric-row"><span>Sotuvlar</span><span id="lm_sales">—</span></div>
-          <div class="metric-row"><span>Daromad</span><span id="lm_revenue">—</span></div>
-          <div class="metric-row highlight">
-            <span>ROI</span><span class="roi-badge" id="lm_roi">—</span>
+        <div class="funnel-block">
+          <div class="funnel-header">🧲 Lead Magnet</div>
+          <div class="funnel-metrics">
+            <div class="metric-row"><span>Ad Spend</span><span id="lm_spend">—</span></div>
+            <div class="metric-row"><span>LP Ko'rishlar</span><span id="lm_views">—</span></div>
+            <div class="metric-row"><span>Yangi Leadlar</span><span id="lm_leads">—</span></div>
+            <div class="metric-row"><span>Ko'rish → Lead konversiya</span><span class="conv-badge" id="lm_lead_conv">—</span></div>
+            <div class="metric-row"><span>Bog'lanilganlar</span><span id="lm_contact">—</span></div>
+            <div class="metric-row"><span>Lead → Aloqa konversiya</span><span class="conv-badge" id="lm_contact_conv">—</span></div>
+            <div class="metric-row"><span>Sotuvlar</span><span id="lm_sales">—</span></div>
+            <div class="metric-row"><span>Daromad</span><span id="lm_revenue">—</span></div>
+            <div class="metric-row highlight"><span>ROI</span><span class="roi-badge" id="lm_roi">—</span></div>
           </div>
         </div>
-      </div>
 
-      <!-- Seminar -->
-      <div class="funnel-block">
-        <div class="funnel-header">🎓 Seminar</div>
-        <div class="funnel-metrics">
-          <div class="metric-row"><span>Ad Spend</span><span id="sem_spend">—</span></div>
-          <div class="metric-row"><span>Ro'yxatdan o'tganlar</span><span id="sem_reg">—</span></div>
-          <div class="metric-row"><span>Kelganlar</span><span id="sem_show">—</span></div>
-          <div class="metric-row"><span>Kelish konversiyasi</span><span class="conv-badge" id="sem_show_conv">—</span></div>
-          <div class="metric-row"><span>Depozitlar</span><span id="sem_dep">—</span></div>
-          <div class="metric-row"><span>Sotuvlar</span><span id="sem_sales">—</span></div>
-          <div class="metric-row"><span>Yopish konversiyasi</span><span class="conv-badge" id="sem_close_conv">—</span></div>
-          <div class="metric-row"><span>To'liq to'lovlar</span><span id="sem_full">—</span></div>
-          <div class="metric-row"><span>Daromad</span><span id="sem_revenue">—</span></div>
-          <div class="metric-row highlight">
-            <span>ROI</span><span class="roi-badge" id="sem_roi">—</span>
+        <div class="funnel-block">
+          <div class="funnel-header">🎓 Seminar</div>
+          <div class="funnel-metrics">
+            <div class="metric-row"><span>Ad Spend</span><span id="sem_spend">—</span></div>
+            <div class="metric-row"><span>Ro'yxatdan o'tganlar</span><span id="sem_reg">—</span></div>
+            <div class="metric-row"><span>Kelganlar</span><span id="sem_show">—</span></div>
+            <div class="metric-row"><span>Kelish konversiyasi</span><span class="conv-badge" id="sem_show_conv">—</span></div>
+            <div class="metric-row"><span>Depozitlar</span><span id="sem_dep">—</span></div>
+            <div class="metric-row"><span>Sotuvlar</span><span id="sem_sales">—</span></div>
+            <div class="metric-row"><span>Yopish konversiyasi</span><span class="conv-badge" id="sem_close_conv">—</span></div>
+            <div class="metric-row"><span>To'liq to'lovlar</span><span id="sem_full">—</span></div>
+            <div class="metric-row"><span>Daromad</span><span id="sem_revenue">—</span></div>
+            <div class="metric-row highlight"><span>ROI</span><span class="roi-badge" id="sem_roi">—</span></div>
           </div>
         </div>
-      </div>
 
-      <!-- Funnel bar chart -->
-      <div class="chart-box" style="margin-top:20px">
-        <h3>Funnel ROI taqqoslash</h3>
-        <canvas id="funnelRoiChart"></canvas>
-      </div>
-    </section>
+        <div class="chart-box" style="margin-top:20px">
+          <h3>Funnel ROI taqqoslash</h3>
+          <canvas id="funnelRoiChart"></canvas>
+        </div>
+      </section>
 
-    <!-- LTV Table -->
-    <section class="table-section">
-      <h3>👥 LTV Cohort — Mijozlar</h3>
-      <div class="table-wrap">
-        <table id="ltvTable">
-          <thead>
-            <tr>
-              <th>Mijoz ID</th><th>Manba</th><th>1-xarid</th>
-              <th>Jami daromad</th><th>Xaridlar soni</th><th>LTV</th>
-            </tr>
-          </thead>
-          <tbody id="ltvBody">
-            <tr><td colspan="6" class="loading">Yuklanmoqda...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <!-- LTV Table -->
+      <section class="table-section">
+        <h3>👥 LTV Cohort — Mijozlar</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mijoz ID</th><th>Manba</th><th>1-xarid</th>
+                <th>Jami daromad</th><th>Xaridlar soni</th><th>LTV</th>
+              </tr>
+            </thead>
+            <tbody id="ltvBody">
+              <tr><td colspan="6" class="loading">Yuklanmoqda...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===================== KUNLIK TAB ===================== -->
+    <div id="panel-kunlik" style="display:none">
+
+      <!-- Filters -->
+      <section class="filter-bar">
+        <div class="filter-group">
+          <label>Dan:</label>
+          <input type="date" id="dateFrom"/>
+        </div>
+        <div class="filter-group">
+          <label>Gacha:</label>
+          <input type="date" id="dateTo"/>
+        </div>
+        <button class="refresh-btn" onclick="loadDaily()">Qo'llash</button>
+        <button class="export-btn" onclick="exportCSV()">⬇ CSV Export</button>
+      </section>
+
+      <!-- Daily period KPI -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Sotuv (davr)</div>
+          <div class="kpi-value" id="todaySales">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Daromad (davr)</div>
+          <div class="kpi-value" id="todayRevenue">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Leads (davr)</div>
+          <div class="kpi-value" id="todayLeads">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ad Spend (davr)</div>
+          <div class="kpi-value" id="todaySpend">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">O'rtacha CAC</div>
+          <div class="kpi-value" id="todayCAC">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">O'rtacha LTV</div>
+          <div class="kpi-value" id="avgLTV">—</div>
+        </div>
+        <div class="kpi-card roi-card">
+          <div class="kpi-label">Davr ROI</div>
+          <div class="kpi-value" id="overallROI">—</div>
+          <div class="kpi-sub" id="roiSub">—</div>
+        </div>
+      </section>
+
+      <!-- Charts Row 1 -->
+      <section class="charts-row">
+        <div class="chart-box">
+          <h3>Daromad dinamikasi</h3>
+          <canvas id="revenueChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Leads & Sotuvlar</h3>
+          <canvas id="leadsSalesChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Charts Row 2 -->
+      <section class="charts-row">
+        <div class="chart-box">
+          <h3>Ad Spend vs CAC</h3>
+          <canvas id="spendCacChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Konversiya % (VSL / LM / Seminar)</h3>
+          <canvas id="convChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Daily breakdown table -->
+      <section class="table-section">
+        <h3>📋 Kunlik ma'lumotlar</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sana</th><th>Ad Spend</th><th>Leads</th><th>Sotuvlar</th>
+                <th>Daromad</th><th>CAC</th><th>Avg LTV</th>
+                <th>VSL %</th><th>LM %</th><th>Sem %</th>
+              </tr>
+            </thead>
+            <tbody id="dailyBody">
+              <tr><td colspan="10" class="loading">Yuklanmoqda...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
   </main>
 
   <script src="/static/dashboard.js"></script>

@@ -78,6 +78,47 @@ def api_summary():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+@app.route("/api/totals")
+@login_required
+def api_totals():
+    try:
+        ss = sheets._connect()
+        ws = ss.worksheet(SHEET_DAILY_SUMMARY)
+        records = ws.get_all_records()
+
+        def sf(v):
+            try: return float(v) if v != "" else 0.0
+            except: return 0.0
+
+        total_spend   = sum(sf(r.get("total_ad_spend")) for r in records)
+        total_leads   = sum(sf(r.get("total_leads")) for r in records)
+        total_sales   = sum(sf(r.get("total_sales")) for r in records)
+        total_revenue = sum(sf(r.get("total_revenue")) for r in records)
+        blended_cac   = round(total_spend / total_sales, 0) if total_sales else 0
+
+        ltv_ws = ss.worksheet(SHEET_LTV_COHORT)
+        ltv_records = ltv_ws.get_all_records()
+        avg_ltv = 0.0
+        if ltv_records:
+            ltvs = [sf(r.get("ltv")) for r in ltv_records if sf(r.get("ltv")) > 0]
+            avg_ltv = round(sum(ltvs) / len(ltvs), 0) if ltvs else 0
+
+        overall_roi = round(total_revenue / total_spend, 2) if total_spend else 0
+
+        return jsonify({"ok": True, "data": {
+            "total_ad_spend": total_spend,
+            "total_leads": total_leads,
+            "total_sales": total_sales,
+            "total_revenue": total_revenue,
+            "blended_cac": blended_cac,
+            "avg_ltv": avg_ltv,
+            "overall_roi": overall_roi,
+            "days_count": len(records),
+        }})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 @app.route("/api/ltv")
 @login_required
 def api_ltv():

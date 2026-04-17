@@ -45,6 +45,33 @@ header {
 }
 .logout-btn:hover { color: #f87171; border-color: #f87171; }
 
+/* Tabs */
+.tabs-bar {
+  background: #1a1d2e;
+  border-bottom: 1px solid #2d3148;
+}
+.tabs-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 4px;
+}
+.tab-btn {
+  background: transparent;
+  color: #8892a4;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 14px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+.tab-btn:hover { color: #e2e8f0; }
+.tab-btn.active { color: #F5A623; border-bottom-color: #F5A623; }
+
 main {
   max-width: 1400px;
   margin: 0 auto;
