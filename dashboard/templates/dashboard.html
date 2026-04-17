@@ -22,8 +22,9 @@
   <!-- Tabs -->
   <div class="tabs-bar">
     <div class="tabs-inner">
-      <button class="tab-btn active" id="tab-umumiy" onclick="switchTab('umumiy')">📊 Umumiy</button>
-      <button class="tab-btn" id="tab-kunlik" onclick="switchTab('kunlik')">📅 Kunlik</button>
+      <button class="tab-btn active" id="tab-umumiy"   onclick="switchTab('umumiy')">📊 Umumiy</button>
+      <button class="tab-btn"        id="tab-kunlik"   onclick="switchTab('kunlik')">📅 Kunlik</button>
+      <button class="tab-btn"        id="tab-tracking" onclick="switchTab('tracking')">🔗 Tracking</button>
     </div>
   </div>
 
@@ -238,6 +239,76 @@
           </table>
         </div>
       </section>
+    </div>
+
+    <!-- ===================== TRACKING TAB ===================== -->
+    <div id="panel-tracking" style="display:none">
+
+      <!-- Create link -->
+      <section class="table-section">
+        <h3>🔗 Yangi tracking havola yaratish</h3>
+        <div class="create-link-form">
+          <input type="text" id="lnkName"   placeholder="Nom (masalan: Facebook Apr)"/>
+          <input type="text" id="lnkSource" placeholder="Manba (facebook / instagram / telegram)"/>
+          <input type="text" id="lnkNotes"  placeholder="Izoh (ixtiyoriy)"/>
+          <button class="refresh-btn" onclick="createLink()">+ Yaratish</button>
+        </div>
+        <div id="linkCreatedMsg" style="display:none" class="link-created-msg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="linksTable">
+            <thead>
+              <tr><th>Nom</th><th>Manba</th><th>Token</th><th>Bot havola</th><th>Mijozlar</th><th>Sotuvlar</th><th>Qotib qolganlar</th></tr>
+            </thead>
+            <tbody id="linksBody">
+              <tr><td colspan="7" class="loading">Yuklanmoqda...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Funnel drop-off per selected link -->
+      <section class="table-section" id="dropoffSection" style="display:none">
+        <h3 id="dropoffTitle">📉 Funnel tushish analizi</h3>
+        <div class="chart-box" style="max-width:700px">
+          <canvas id="dropoffChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Stuck customers -->
+      <section class="table-section" id="stuckSection" style="display:none">
+        <h3 id="stuckTitle">⏸ Qotib qolgan mijozlar</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Mijoz ID</th><th>Bosqich</th><th>Funnel</th><th>Sana</th><th>Izoh</th></tr>
+            </thead>
+            <tbody id="stuckBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- All journeys -->
+      <section class="table-section">
+        <h3>📋 Barcha mijoz yozuvlari</h3>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <input type="text" id="journeySearch" placeholder="Mijoz ID bo'yicha qidirish..."
+                 oninput="filterJourney()" class="search-input"/>
+          <select id="journeyLinkFilter" onchange="filterJourney()" class="select-input">
+            <option value="">— Barcha havolalar</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Sana</th><th>Mijoz ID</th><th>Havola</th><th>Funnel</th><th>Bosqich</th><th>Izoh</th></tr>
+            </thead>
+            <tbody id="journeyBody">
+              <tr><td colspan="6" class="loading">Yuklanmoqda...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
     </div>
 
   </main>

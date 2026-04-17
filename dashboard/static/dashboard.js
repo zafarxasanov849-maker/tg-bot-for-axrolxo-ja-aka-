@@ -55,25 +55,22 @@ function makeChart(id, type, labels, datasets, opts = {}) {
 
 // ─── Tab switching ────────────────────────────────────────────────────────────
 
+let trackingLoaded = false;
+
 function switchTab(name) {
   activeTab = name;
-  document.getElementById('panel-umumiy').style.display = name === 'umumiy' ? '' : 'none';
-  document.getElementById('panel-kunlik').style.display = name === 'kunlik' ? '' : 'none';
-  document.getElementById('tab-umumiy').classList.toggle('active', name === 'umumiy');
-  document.getElementById('tab-kunlik').classList.toggle('active', name === 'kunlik');
-
-  if (name === 'kunlik' && !dailyLoaded) {
-    loadDaily();
-  }
+  ['umumiy', 'kunlik', 'tracking'].forEach(t => {
+    document.getElementById('panel-' + t).style.display = t === name ? '' : 'none';
+    document.getElementById('tab-' + t).classList.toggle('active', t === name);
+  });
+  if (name === 'kunlik'  && !dailyLoaded)    loadDaily();
+  if (name === 'tracking' && !trackingLoaded) loadTracking();
 }
 
 function reloadActive() {
-  if (activeTab === 'umumiy') {
-    loadUmumiy();
-  } else {
-    dailyLoaded = false;
-    loadDaily();
-  }
+  if (activeTab === 'umumiy')   { loadUmumiy(); }
+  else if (activeTab === 'kunlik') { dailyLoaded = false; loadDaily(); }
+  else { trackingLoaded = false; loadTracking(); }
 }
 
 // ─── UMUMIY tab ───────────────────────────────────────────────────────────────
@@ -275,6 +272,161 @@ async function loadDaily() {
       <td>${r.seminar_conv_rate || 0}%</td>
     </tr>
   `).join('');
+}
+
+// ─── TRACKING tab ─────────────────────────────────────────────────────────────
+
+const STAGE_LABELS = {
+  ad_viewed:           '👁 Reklamani ko\'rdi',
+  link_clicked:        '🖱 Havolani bosdi',
+  video_watched:       '▶️ Video ko\'rdi',
+  lead_captured:       '📋 Lead bo\'ldi',
+  seminar_registered:  '📝 Seminar ro\'yxat',
+  seminar_attended:    '🎓 Keldi',
+  contacted:           '💬 Bog\'lanildi',
+  deposited:           '💰 Depozit',
+  purchased:           '✅ Xarid',
+  dropped_off:         '❌ Ketdi',
+};
+
+const STAGE_ORDER = [
+  'ad_viewed','link_clicked','video_watched','lead_captured',
+  'seminar_registered','seminar_attended','contacted','deposited','purchased',
+];
+
+let allJourneyRecords = [];
+let allLinkStats = [];
+
+async function loadTracking() {
+  trackingLoaded = true;
+  const [statsRes, journeyRes] = await Promise.all([
+    fetch('/api/tracking/stats'),
+    fetch('/api/tracking/journey'),
+  ]);
+  const statsJson   = await statsRes.json();
+  const journeyJson = await journeyRes.json();
+
+  if (statsJson.ok)   { allLinkStats = statsJson.data;   renderLinksTable(statsJson.data); }
+  if (journeyJson.ok) { allJourneyRecords = journeyJson.data; renderJourneyTable(journeyJson.data); populateLinkFilter(journeyJson.data); }
+}
+
+function renderLinksTable(stats) {
+  const tbody = document.getElementById('linksBody');
+  if (!stats.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">Hali havola yaratilmagan. Yuqoridagi formdan yarating.</td></tr>';
+    return;
+  }
+  const BOT = 'https://t.me/YourBotUsername?start=';
+  tbody.innerHTML = stats.map(s => `
+    <tr style="cursor:pointer" onclick="showLinkDetail('${s.token}')">
+      <td><strong>${s.name || s.token}</strong></td>
+      <td>${s.source || '—'}</td>
+      <td><code>${s.token}</code></td>
+      <td>
+        <button class="copy-btn" onclick="event.stopPropagation();copyLink('${s.token}')">📋 Nusxa</button>
+      </td>
+      <td style="color:#4e8ef7;font-weight:600">${s.total_customers}</td>
+      <td style="color:#34d399;font-weight:600">${s.purchased}</td>
+      <td style="color:${s.stuck.length ? '#f87171' : '#64748b'};font-weight:600">${s.stuck.length}</td>
+    </tr>
+  `).join('');
+}
+
+function copyLink(token) {
+  const text = `https://t.me/YourBotUsername?start=${token}`;
+  navigator.clipboard.writeText(text).then(() => alert('Havola nusxalandi:\n' + text));
+}
+
+function showLinkDetail(token) {
+  const stat = allLinkStats.find(s => s.token === token);
+  if (!stat) return;
+
+  // Drop-off chart
+  document.getElementById('dropoffSection').style.display = '';
+  document.getElementById('dropoffTitle').textContent = `📉 "${stat.name}" — funnel tushish`;
+  const counts = STAGE_ORDER.map(s => stat.stages[s] || 0);
+  makeChart('dropoffChart', 'bar', STAGE_ORDER.map(s => STAGE_LABELS[s] || s), [{
+    label: 'Mijozlar soni',
+    data: counts,
+    backgroundColor: counts.map((_, i) => `rgba(78,142,247,${1 - i * 0.08})`),
+    borderRadius: 6,
+  }]);
+
+  // Stuck table
+  document.getElementById('stuckSection').style.display = stat.stuck.length ? '' : 'none';
+  document.getElementById('stuckTitle').textContent = `⏸ "${stat.name}" — qotib qolganlar (${stat.stuck.length} ta)`;
+  document.getElementById('stuckBody').innerHTML = stat.stuck.map(c => `
+    <tr>
+      <td><strong>${c.customer_id}</strong></td>
+      <td>${STAGE_LABELS[c.stage] || c.stage}</td>
+      <td>${c.funnel_type || '—'}</td>
+      <td>${c.date || '—'}</td>
+      <td>${c.notes || '—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="loading">—</td></tr>';
+
+  document.getElementById('dropoffSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function populateLinkFilter(records) {
+  const sel = document.getElementById('journeyLinkFilter');
+  const tokens = [...new Set(records.map(r => r.link_token).filter(Boolean))];
+  sel.innerHTML = '<option value="">— Barcha havolalar</option>' +
+    tokens.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderJourneyTable(records) {
+  const tbody = document.getElementById('journeyBody');
+  if (!records.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="loading">Hali yozuv yo\'q</td></tr>';
+    return;
+  }
+  tbody.innerHTML = records.slice(0, 200).map(r => `
+    <tr>
+      <td>${r.date || '—'}</td>
+      <td><strong>${r.customer_id || '—'}</strong></td>
+      <td><code>${r.link_token || 'direct'}</code></td>
+      <td>${r.funnel_type || '—'}</td>
+      <td>${STAGE_LABELS[r.stage] || r.stage || '—'}</td>
+      <td>${r.notes || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function filterJourney() {
+  const q    = (document.getElementById('journeySearch').value || '').toLowerCase();
+  const link = document.getElementById('journeyLinkFilter').value;
+  let filtered = allJourneyRecords;
+  if (q)    filtered = filtered.filter(r => (r.customer_id || '').toLowerCase().includes(q));
+  if (link) filtered = filtered.filter(r => r.link_token === link);
+  renderJourneyTable(filtered);
+}
+
+async function createLink() {
+  const name   = document.getElementById('lnkName').value.trim();
+  const source = document.getElementById('lnkSource').value.trim();
+  const notes  = document.getElementById('lnkNotes').value.trim();
+  if (!name || !source) { alert('Nom va manba majburiy!'); return; }
+
+  const res  = await fetch('/api/tracking/links', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, source, notes }),
+  });
+  const json = await res.json();
+  if (!json.ok) { alert('Xato: ' + json.error); return; }
+
+  const msg = document.getElementById('linkCreatedMsg');
+  const link = `https://t.me/YourBotUsername?start=${json.token}`;
+  msg.style.display = '';
+  msg.innerHTML = `✅ Yaratildi! Token: <code>${json.token}</code><br>Havola: <code>${link}</code>
+    <button class="copy-btn" style="margin-left:8px" onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Nusxalandi!'))">📋 Nusxa</button>`;
+
+  document.getElementById('lnkName').value = '';
+  document.getElementById('lnkSource').value = '';
+  document.getElementById('lnkNotes').value = '';
+  trackingLoaded = false;
+  await loadTracking();
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

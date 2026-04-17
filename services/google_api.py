@@ -26,6 +26,15 @@ from config import (
     SPREADSHEET_ID,
 )
 
+SHEET_TRACKING_LINKS   = "Tracking_Links"
+SHEET_CUSTOMER_JOURNEY = "Customer_Journey"
+
+LINK_HEADERS    = ["token", "name", "source", "notes", "created_at"]
+JOURNEY_HEADERS = [
+    "timestamp", "date", "reporter_id", "customer_id",
+    "link_token", "funnel_type", "stage", "notes",
+]
+
 logger = logging.getLogger(__name__)
 
 SCOPES = [
@@ -96,6 +105,8 @@ class GoogleSheetsService:
                 "total_revenue", "blended_cac", "avg_ltv",
                 "vsl_conv_rate", "lm_conv_rate", "seminar_conv_rate",
             ],
+            SHEET_TRACKING_LINKS:   LINK_HEADERS,
+            SHEET_CUSTOMER_JOURNEY: JOURNEY_HEADERS,
         }
 
         for title, headers in tabs_headers.items():
@@ -250,6 +261,79 @@ class GoogleSheetsService:
              blended_cac, avg_ltv, vsl_conv, lm_conv, sem_conv],
             value_input_option="USER_ENTERED",
         )
+
+
+    # ------------------------------------------------------------------
+    # Tracking Links
+    # ------------------------------------------------------------------
+
+    def get_tracking_links_sync(self) -> list[dict]:
+        ss = self._connect()
+        return ss.worksheet(SHEET_TRACKING_LINKS).get_all_records()
+
+    async def get_tracking_links(self) -> list[dict]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.get_tracking_links_sync)
+
+    async def create_tracking_link(
+        self, token: str, name: str, source: str, notes: str = ""
+    ) -> None:
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self._create_link_sync, token, name, source, notes)
+
+    def _create_link_sync(self, token: str, name: str, source: str, notes: str) -> None:
+        ss = self._connect()
+        ws = ss.worksheet(SHEET_TRACKING_LINKS)
+        ws.append_row(
+            [token, name, source, notes, datetime.now().isoformat()],
+            value_input_option="USER_ENTERED",
+        )
+
+    # ------------------------------------------------------------------
+    # Customer Journey
+    # ------------------------------------------------------------------
+
+    async def log_customer_stage(
+        self,
+        reporter_id: int,
+        customer_id: str,
+        link_token: str,
+        funnel_type: str,
+        stage: str,
+        notes: str = "",
+    ) -> None:
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(
+            None, self._log_stage_sync,
+            reporter_id, customer_id, link_token, funnel_type, stage, notes,
+        )
+
+    def _log_stage_sync(
+        self,
+        reporter_id: int,
+        customer_id: str,
+        link_token: str,
+        funnel_type: str,
+        stage: str,
+        notes: str,
+    ) -> None:
+        ss = self._connect()
+        ws = ss.worksheet(SHEET_CUSTOMER_JOURNEY)
+        now = datetime.now()
+        ws.append_row(
+            [now.isoformat(), date.today().isoformat(),
+             str(reporter_id), customer_id,
+             link_token, funnel_type, stage, notes],
+            value_input_option="USER_ENTERED",
+        )
+
+    def get_customer_journey_sync(self) -> list[dict]:
+        ss = self._connect()
+        return ss.worksheet(SHEET_CUSTOMER_JOURNEY).get_all_records()
+
+    async def get_customer_journey(self) -> list[dict]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.get_customer_journey_sync)
 
 
 class GoogleDriveService:

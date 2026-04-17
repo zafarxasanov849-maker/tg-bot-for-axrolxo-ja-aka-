@@ -19,6 +19,7 @@ from handlers import (
     seminar_router,
     sales_router,
     stats_router,
+    journey_router,
 )
 from services.google_api import GoogleSheetsService
 from services.scheduler import start_scheduler
@@ -45,6 +46,7 @@ async def main() -> None:
     dp.include_router(lead_magnet_router)
     dp.include_router(seminar_router)
     dp.include_router(sales_router)
+    dp.include_router(journey_router)
 
     # Ensure Google Sheets tabs exist (skip if service_account.json not configured)
     sheets = GoogleSheetsService()

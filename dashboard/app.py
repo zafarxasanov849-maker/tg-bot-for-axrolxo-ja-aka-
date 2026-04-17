@@ -331,5 +331,136 @@ def api_raw():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+@app.route("/api/tracking/links", methods=["GET"])
+@login_required
+def api_tracking_links_get():
+    try:
+        links = sheets.get_tracking_links_sync()
+        return jsonify({"ok": True, "data": links})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/tracking/links", methods=["POST"])
+@login_required
+def api_tracking_links_post():
+    try:
+        import re
+        body  = request.get_json(force=True)
+        name  = body.get("name", "").strip()
+        source= body.get("source", "").strip()
+        notes = body.get("notes", "").strip()
+        if not name or not source:
+            return jsonify({"ok": False, "error": "name va source majburiy"}), 400
+        token = re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_"))[:30]
+        token = f"{token}_{date.today().strftime('%m%d')}"
+        # sync call (dashboard is single-threaded Flask)
+        sheets._create_link_sync(token, name, source, notes)
+        return jsonify({"ok": True, "token": token})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/tracking/journey")
+@login_required
+def api_tracking_journey():
+    try:
+        from services.google_api import SHEET_CUSTOMER_JOURNEY
+        ss = sheets._connect()
+        records = ss.worksheet(SHEET_CUSTOMER_JOURNEY).get_all_records()
+        records = sorted(records, key=lambda r: r.get("timestamp", ""), reverse=True)
+
+        link_filter = request.args.get("link", "")
+        if link_filter:
+            records = [r for r in records if r.get("link_token") == link_filter]
+
+        return jsonify({"ok": True, "data": records})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/tracking/customer/<customer_id>")
+@login_required
+def api_tracking_customer(customer_id):
+    try:
+        from services.google_api import SHEET_CUSTOMER_JOURNEY
+        ss = sheets._connect()
+        records = ss.worksheet(SHEET_CUSTOMER_JOURNEY).get_all_records()
+        journey = [r for r in records if r.get("customer_id") == customer_id]
+        journey = sorted(journey, key=lambda r: r.get("timestamp", ""))
+        return jsonify({"ok": True, "data": journey})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/tracking/stats")
+@login_required
+def api_tracking_stats():
+    """Per-link funnel stage counts + stuck customers."""
+    try:
+        from services.google_api import SHEET_CUSTOMER_JOURNEY
+        ss = sheets._connect()
+        records = ss.worksheet(SHEET_CUSTOMER_JOURNEY).get_all_records()
+        links   = sheets.get_tracking_links_sync()
+
+        STAGE_ORDER = [
+            "ad_viewed", "link_clicked", "video_watched", "lead_captured",
+            "seminar_registered", "seminar_attended", "contacted",
+            "deposited", "purchased", "dropped_off",
+        ]
+
+        # Per-link: last stage per customer
+        link_stats: dict[str, dict] = {}
+        for lnk in links:
+            link_stats[lnk["token"]] = {
+                "token": lnk["token"], "name": lnk["name"],
+                "source": lnk["source"],
+                "stages": {s: 0 for s in STAGE_ORDER},
+                "total_customers": 0, "purchased": 0, "dropped_off": 0,
+                "stuck": [],   # customers whose last event is NOT purchased/dropped
+            }
+
+        # group by (link_token, customer_id) → last stage
+        from collections import defaultdict
+        last: dict[tuple, dict] = defaultdict(dict)
+        for r in records:
+            key = (r.get("link_token", "direct"), r.get("customer_id", ""))
+            if not key[1]:
+                continue
+            existing = last.get(key)
+            if not existing or r.get("timestamp", "") > existing.get("timestamp", ""):
+                last[key] = r
+
+        for (token, cid), r in last.items():
+            if token not in link_stats:
+                link_stats[token] = {
+                    "token": token, "name": token, "source": "—",
+                    "stages": {s: 0 for s in STAGE_ORDER},
+                    "total_customers": 0, "purchased": 0, "dropped_off": 0,
+                    "stuck": [],
+                }
+            ls = link_stats[token]
+            stage = r.get("stage", "")
+            ls["total_customers"] += 1
+            if stage in ls["stages"]:
+                ls["stages"][stage] += 1
+            if stage == "purchased":
+                ls["purchased"] += 1
+            elif stage == "dropped_off":
+                ls["dropped_off"] += 1
+            else:
+                ls["stuck"].append({
+                    "customer_id": cid,
+                    "stage": stage,
+                    "date": r.get("date", ""),
+                    "funnel_type": r.get("funnel_type", ""),
+                    "notes": r.get("notes", ""),
+                })
+
+        return jsonify({"ok": True, "data": list(link_stats.values())})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=False)
