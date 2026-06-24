@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NADO Academy — Tikuvchilikda sizga mos yo'lni birga topamiz</title>
+  <meta name="description" content="Kurs sotmaymiz — avval real holatingizni tahlil qilamiz. Konstruksiya, tikuv va atelye uchun halol tashxis va shaxsiy yo'l." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="badge">TASHXIS ASOSIDA YONDASHUV</div>
+    <h1>
+      Tikuvchilik <span class="accent">sizga</span> mos kelishini<br>
+      avval birga aniqlaylik
+    </h1>
+    <p class="hero-sub">
+      NADO Academy hammaga bir xil kursni sotmaydi. Avval real holatingizni ko'ramiz —
+      vaqtingiz, tajribangiz, maqsadingiz. Agar mos kelmasa, buni ham ochiq aytamiz.
+    </p>
+    <div class="hero-actions">
+      <a href="#diagnosis" class="btn btn-primary">30 soniyalik tashxisdan boshlash ↓</a>
+      <a href="https://t.me/nado_academy" target="_blank" class="btn btn-outline">Telegramda savol berish</a>
+    </div>
+    <p class="hero-note">Halol maslahat · Hech qanday "tezda boy bo'lish" va'dasi yo'q</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     REALITY CHECK
+════════════════════════════════════════════ -->
+<section class="reality">
+  <div class="container">
+    <h2>Tanishmi bu holatlar?</h2>
+    <p class="section-sub">Bularning birortasi bo'lsa ham — bu normal. Aynan shu uchun avval gaplashamiz.</p>
+    <div class="reality-grid">
+      <div class="reality-card">
+        <span class="reality-icon">😓</span>
+        <p>Avval 2-3 ta kurs sotib olgan, lekin tashlab ketgan</p>
+      </div>
+      <div class="reality-card">
+        <span class="reality-icon">📏</span>
+        <p>Tanangiz "standart" o'lchamga to'g'ri kelmaydi, naqshlar mos tushmaydi</p>
+      </div>
+      <div class="reality-card">
+        <span class="reality-icon">🏠</span>
+        <p>Eringiz/oilangiz munosabati noaniq — yoki haliyam so'ramagansiz</p>
+      </div>
+      <div class="reality-card">
+        <span class="reality-icon">⏳</span>
+        <p>Pul tezroq kerak, lekin ko'nikma hafta-oylar talab qilishini bilasiz</p>
+      </div>
+      <div class="reality-card">
+        <span class="reality-icon">🧵</span>
+        <p>Vaqt yo'q — bola, uy ishi, asosiy ish orasida siqilib qolgansiz</p>
+      </div>
+      <div class="reality-card">
+        <span class="reality-icon">📈</span>
+        <p>Atelyeingiz bor, lekin sifat/portfolio bilan bir joyda tiqilib qolgansiz</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     DIAGNOSIS QUIZ
+════════════════════════════════════════════ -->
+<section class="diagnosis" id="diagnosis">
+  <div class="container">
+    <h2>Tezkor tashxis</h2>
+    <p class="section-sub">4 savol. Sizga halol javob beramiz — mos kelsa ham, kelmasa ham.</p>
+
+    <div class="quiz-box" id="quizBox">
+
+      <div class="quiz-step active" data-step="1">
+        <p class="quiz-q">1. Tikuvchilik tajribangiz qanday?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" data-q="experience" data-v="beginner">Boshlang'ich — deyarli noldan</button>
+          <button class="quiz-opt" data-q="experience" data-v="basic">Asoslari bor, lekin tizimli emas</button>
+          <button class="quiz-opt" data-q="experience" data-v="atelier">Atelye yuritaman / mijozlarim bor</button>
+        </div>
+      </div>
+
+      <div class="quiz-step" data-step="2">
+        <p class="quiz-q">2. Haftasiga real qancha vaqt ajrata olasiz?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" data-q="time" data-v="low">3 soatdan kam</button>
+          <button class="quiz-opt" data-q="time" data-v="mid">3–7 soat</button>
+          <button class="quiz-opt" data-q="time" data-v="high">7 soatdan ko'p</button>
+        </div>
+      </div>
+
+      <div class="quiz-step" data-step="3">
+        <p class="quiz-q">3. Avval kurs sotib olib, tashlab ketganmisiz?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" data-q="history" data-v="dropped">Ha, bir nechta marta</button>
+          <button class="quiz-opt" data-q="history" data-v="finished">Tugatdim, lekin natija kam bo'ldi</button>
+          <button class="quiz-opt" data-q="history" data-v="first">Yo'q, birinchi marta</button>
+        </div>
+      </div>
+
+      <div class="quiz-step" data-step="4">
+        <p class="quiz-q">4. Maqsadingiz nima?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt" data-q="goal" data-v="fast">Iloji boricha tez daromad</button>
+          <button class="quiz-opt" data-q="goal" data-v="income">Doimiy qo'shimcha/asosiy daromad</button>
+          <button class="quiz-opt" data-q="goal" data-v="scale">Mavjud atelyeni kattalashtirish</button>
+        </div>
+      </div>
+
+      <div class="quiz-result" data-step="result">
+        <div id="resultContent"></div>
+        <a href="https://t.me/nado_academy" target="_blank" class="btn btn-primary">Holatimni batafsil aytaman →</a>
+        <button class="quiz-restart" onclick="restartQuiz()">↺ Qaytadan boshlash</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOR WHOM
+════════════════════════════════════════════ -->
+<section class="forwhom">
+  <div class="container">
+    <h2>Kimga mos, kimga mos emas</h2>
+    <div class="fw-grid">
+      <div class="fw-yes">
+        <h3>Mos keladi</h3>
+        <ul>
+          <li>Haftalik ritmga (ozgina bo'lsa ham doimiy vaqt) tayyor bo'lsangiz</li>
+          <li>4 oy davomida bosqichma-bosqich o'rganishga roziligingiz bo'lsa</li>
+          <li>Markaziy Osiyo tana tipi uchun konstruksiyani noldan o'rganmoqchi bo'lsangiz</li>
+          <li>Atelye yuritib, sifat/portfolio bilan tiqilib qolgan bo'lsangiz</li>
+          <li>Avvalgi kursdan nima uchun chiqib ketganingizni bilsangiz va boshqa format kerak bo'lsa</li>
+        </ul>
+      </div>
+      <div class="fw-no">
+        <h3>Mos kelmaydi</h3>
+        <ul>
+          <li>2 hafta ichida daromad kerak bo'lsa — konstruksiya ko'nikmasi shu qadar tez shakllanmaydi</li>
+          <li>Haftasiga bironta vaqt ajratib bo'lmasa (0 soat)</li>
+          <li>Oilada hal qilinmagan, real qarshilik bor bo'lib, bu birinchi muhokama qilinmagan bo'lsa</li>
+          <li>"Harakatsiz natija" kutilsa — bu kurs emas, sizning ishtirokingiz kerak</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SYSTEM (not features)
+════════════════════════════════════════════ -->
+<section class="system">
+  <div class="container">
+    <h2>Tizim qanday ishlaydi</h2>
+    <p class="section-sub">Bu video darslar to'plami emas — kuzatib boriladigan tizim</p>
+    <div class="system-list">
+      <div class="system-item">
+        <div class="system-num">01</div>
+        <div>
+          <h4>Haftalik ritm</h4>
+          <p>Har hafta aniq vazifa va aniq muddat — "keyinroq qilaman" degan holatga o'rin qolmaydi</p>
+        </div>
+      </div>
+      <div class="system-item">
+        <div class="system-num">02</div>
+        <div>
+          <h4>Kurator nazorati</h4>
+          <p>Ismli kurator har kuni ishingizni ko'rib chiqadi — taxmin qilib o'tirishingiz shart emas</p>
+        </div>
+      </div>
+      <div class="system-item">
+        <div class="system-num">03</div>
+        <div>
+          <h4>Nasiba tomonidan portfolio ko'rib chiqish</h4>
+          <p>Shunchaki "tugatdingiz" emas — ishingiz bozor talabiga mosligi haqida real fikr olasiz</p>
+        </div>
+      </div>
+      <div class="system-item">
+        <div class="system-num">04</div>
+        <div>
+          <h4>Talabalar jamoasi</h4>
+          <p>Sizga o'xshash ayollarning real jarayonini va natijasini ko'rib borasiz — yolg'iz emassiz</p>
+        </div>
+      </div>
+      <div class="system-item">
+        <div class="system-num">05</div>
+        <div>
+          <h4>Markaziy Osiyo tana anatomiyasi</h4>
+          <p>G'arb andozalarini "moslashtirish" emas — o'zingiz va mijozlaringiz uchun to'g'ridan-to'g'ri o'lchab konstruksiya qilish</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     OBJECTIONS / FAQ
+════════════════════════════════════════════ -->
+<section class="faq">
+  <div class="container">
+    <h2>Eng ko'p aytilgan gaplar — halol javoblar</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          "Avval pul sarflab kurs olganman, tashlab ketganman"
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Bu juda muhim signal. Avval nimadan to'xtaganingizni aniqlashtiramiz — kontent zerikarli edi,
+          qo'llab-quvvatlash yo'q edi, yoki motivatsiya yo'qoldi. Bu yerda haftalik kuzatuv va har kuni
+          ishingizni ko'rib turadigan kurator bor — aynan "tashlab ketish" muammosiga qarshi qurilgan format.
+          Lekin agar sabab boshqacha bo'lsa, buni ham ochiq aytamiz.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          "Tanam standart emas, menga mos kelmaydi"
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Bu kursda tayyor andozani tanangizga "moslashtirish" o'rgatilmaydi — Markaziy Osiyo ayollari
+          tana tipiga mos o'lchash va konstruksiya qilish o'rgatiladi. Bu nafaqat o'zingiz, balki turli
+          tana tipidagi mijozlaringiz uchun ham ishlaydi.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          "Vaqtim yo'q — bola, uy ishi, eringiz"
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Haqiqatda haftasiga necha soat ajrata olasizni o'zingiz bilasiz. Platforma 24/7 ochiq,
+          jonli darslar oyiga atiga 2 marta. Lekin agar haftasiga 0 soat bo'lsa — halol aytamiz: bu kurs
+          hozir emas, keyinroq mos keladi. Vaqt muammosi bormi yoki energiya/tartib muammosi — buni
+          birga aniqlashtiramiz.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          "Daromad raqamlari ishonarli emas"
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          To'g'ri, raqamlarga ishonmang. Real talabalarning Telegram skrinshotlari, real tikilgan
+          kiyimlari, real mijoz buyurtmalarini ko'rsatamiz — modellar emas, sizga o'xshagan odamlar.
+          Quyida namunalarni ko'ring.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          "Eringiz/oilam ruxsat bermaydi"
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Bu — haqiqatan aytilgan "yo'q"mi, yoki siz so'ramasdan shunday deb o'ylayapsizmi? Agar
+          haqiqatan qarshilik bo'lsa, avval shuni hal qilish kerak — kurs buni hal qilmaydi.
+          Lekin ko'pincha "birinchi oyda daromad qilaman" deb aniq reja bilan gaplashilganda
+          munosabat o'zgaradi. Bu hobbi emas, kasb — va u uydan boshlanadi.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          "Yoshim katta (40-50), kech emasmi?"
+          <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Yosh — muammo emas, ko'nikma yo'qligi muammo. Va ko'nikma 4 oyda shakllanadi.
+          Quyida 40 yoshdan oshgan bitiruvchilarimiz natijalarini ko'rasiz.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TESTIMONIALS (placeholder — almashtirish kerak)
+════════════════════════════════════════════ -->
+<section class="testimonials">
+  <div class="container">
+    <h2>Modellar emas — real talabalar</h2>
+    <p class="section-sub">Bu yerga haqiqiy talaba skrinshotlari va natija rasmlari qo'yiladi</p>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-avatar">B</div>
+        <h4>Talaba ismi (masalan: Barnoxon)</h4>
+        <p class="testi-meta">[Yo'nalish / shahar / yosh]</p>
+        <p class="testi-quote">[Bu yerga talabaning real Telegram skrinshoti yoki tikkan kiyimi rasmi va qisqa izohi qo'yiladi]</p>
+      </div>
+      <div class="testi-card">
+        <div class="testi-avatar">M</div>
+        <h4>Talaba ismi (masalan: Muqaddas)</h4>
+        <p class="testi-meta">[Yo'nalish / shahar / yosh]</p>
+        <p class="testi-quote">[Bu yerga talabaning real mijoz buyurtmasi yoki natija skrinshoti qo'yiladi]</p>
+      </div>
+      <div class="testi-card">
+        <div class="testi-avatar">+40</div>
+        <h4>Talaba ismi (40+ yosh namunasi)</h4>
+        <p class="testi-meta">[Yo'nalish / shahar / yosh]</p>
+        <p class="testi-quote">["Yoshim katta" degan e'tirozga javob — real bitiruvchi natijasi shu yerda]</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     POSITIONING (narx emas, yo'l)
+════════════════════════════════════════════ -->
+<section class="positioning">
+  <div class="container">
+    <h2>Sizning yo'lingiz</h2>
+    <p class="section-sub">Har bir talaba uchun kerakli yordam darajasi boshqacha — narx haqida emas, yo'l haqida gaplashamiz</p>
+    <div class="pos-grid">
+      <div class="pos-card">
+        <h4>Boshlang'ich + oila bosimi</h4>
+        <p>Sizga kerak bo'lgan narsa — kuratorlangan ritm va sizga o'xshagan ayollar jamoasi.
+        Bu yerda yolg'iz qolmaysiz, har qadam belgilangan.</p>
+      </div>
+      <div class="pos-card">
+        <h4>Tajribali, lekin to'xtab qolgan</h4>
+        <p>Sizga kerak bo'lgan narsa — har bir ishingizga shaxsiy fikr va portfolio ko'rib chiqish.
+        Bu hammani o'zgartiradi.</p>
+      </div>
+      <div class="pos-card">
+        <h4>Atelyeni kattalashtirish</h4>
+        <p>Sizga kerak bo'lgan narsa — tezkor amaliyot va Nasibaning sifat nazorati. Vaqt muhim.</p>
+      </div>
+    </div>
+    <p class="pos-bottom">
+      Har bir talabaning yo'li boshqacha. Real holatingizni tushunganimizdan keyin,
+      to'g'ri yondashuv o'z-o'zidan ravshan bo'ladi.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FINAL CTA
+════════════════════════════════════════════ -->
+<section class="form-section" id="contact">
+  <div class="container">
+    <h2>Holatingizni ayting</h2>
+    <p class="section-sub">
+      Narx yoki ro'yxatdan o'tish haqida hali emas — avval real suhbat.<br>
+      Mos kelsa aytamiz, kelmasa ham ochiq aytamiz.
+    </p>
+    <a href="https://t.me/nado_academy" target="_blank" class="btn btn-primary btn-lg">
+      Telegram orqali yozish →
+    </a>
+    <p class="form-privacy">Javob odatda 24 soat ichida keladi.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2026 NADO Academy. Barcha huquqlar himoyalangan.</p>
+    <p class="footer-contact">
+      Savol uchun: <a href="https://t.me/nado_academy" target="_blank">@nado_academy</a>
+    </p>
+  </div>
+</footer>
+
+<!-- Sticky CTA -->
+<div class="sticky-cta">
+  <a href="#diagnosis" class="btn btn-primary">Tashxisdan boshlash →</a>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
