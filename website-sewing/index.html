@@ -351,10 +351,31 @@
       Narx yoki ro'yxatdan o'tish haqida hali emas — avval real suhbat.<br>
       Mos kelsa aytamiz, kelmasa ham ochiq aytamiz.
     </p>
-    <a href="https://t.me/nado_academy" target="_blank" class="btn btn-primary btn-lg">
-      Telegram orqali yozish →
-    </a>
-    <p class="form-privacy">Javob odatda 24 soat ichida keladi.</p>
+
+    <form class="lead-form" id="leadForm" onsubmit="submitForm(event)">
+      <input type="hidden" name="quiz_experience" id="quizExperience" />
+      <input type="hidden" name="quiz_time" id="quizTime" />
+      <input type="hidden" name="quiz_history" id="quizHistory" />
+      <input type="hidden" name="quiz_goal" id="quizGoal" />
+
+      <input type="text" name="name" placeholder="Ismingiz" required />
+      <input type="tel" name="phone" placeholder="Telefon raqamingiz (+998...)" required />
+      <input type="text" name="telegram" placeholder="Telegram username (masalan @ism)" />
+      <textarea name="situation" placeholder="Holatingiz haqida qisqacha (ixtiyoriy) — tajribangiz, maqsadingiz, asosiy to'siq" rows="3"></textarea>
+      <button type="submit" class="btn btn-primary btn-full">
+        Yuborish →
+      </button>
+      <p class="form-privacy">Ma'lumotlaringiz uchinchi shaxslarga berilmaydi. Javob odatda 24 soat ichida keladi.</p>
+    </form>
+    <div class="form-success" id="formSuccess">
+      <div class="success-icon">✅</div>
+      <h3>Arizangiz qabul qilindi!</h3>
+      <p>24 soat ichida siz bilan bog'lanamiz.</p>
+    </div>
+
+    <p class="form-alt">
+      Yoki to'g'ridan-to'g'ri: <a href="https://t.me/nado_academy" target="_blank">Telegramda yozish →</a>
+    </p>
   </div>
 </section>
 

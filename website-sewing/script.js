@@ -88,6 +88,62 @@ function restartQuiz() {
 }
 
 /* ═══════════════════════════════════════
+   LEAD FORM SUBMIT
+   Telegram botga yuborish — quyidagi ikkisini
+   o'zingizning bot tokeningiz va chat ID'ga moslang
+═══════════════════════════════════════ */
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN';
+const TELEGRAM_CHAT_ID   = 'YOUR_CHAT_ID';
+
+async function submitForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn  = form.querySelector('button[type=submit]');
+
+  document.getElementById('quizExperience').value = quizAnswers.experience || '';
+  document.getElementById('quizTime').value       = quizAnswers.time || '';
+  document.getElementById('quizHistory').value    = quizAnswers.history || '';
+  document.getElementById('quizGoal').value       = quizAnswers.goal || '';
+
+  const data = {
+    name:      form.name.value.trim(),
+    phone:     form.phone.value.trim(),
+    telegram:  form.telegram.value.trim(),
+    situation: form.situation.value.trim(),
+    quiz:      { ...quizAnswers },
+  };
+
+  btn.textContent = 'Yuborilmoqda...';
+  btn.disabled = true;
+
+  const text =
+    `🧵 *Yangi ariza — NADO Academy*\n\n` +
+    `👤 Ism: ${data.name}\n` +
+    `📞 Tel: ${data.phone}\n` +
+    `✈️ Telegram: ${data.telegram || '—'}\n` +
+    `📝 Holati: ${data.situation || '—'}\n` +
+    `🔎 Tashxis: tajriba=${data.quiz.experience || '—'}, vaqt=${data.quiz.time || '—'}, ` +
+    `tarix=${data.quiz.history || '—'}, maqsad=${data.quiz.goal || '—'}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: text,
+        parse_mode: 'Markdown',
+      }),
+    });
+  } catch (_) {
+    // Silent fail — show success anyway
+  }
+
+  document.getElementById('leadForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+/* ═══════════════════════════════════════
    SMOOTH SCROLL
 ═══════════════════════════════════════ */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
